@@ -1,0 +1,8 @@
+/bin/bash
+/opt/workflow
+file
+/opt/workflow/server-conf
+sge
+/diag/software/sge-root
+diag
+/tmp
