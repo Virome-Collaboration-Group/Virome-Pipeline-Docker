@@ -1,7 +1,10 @@
 ############################################################
-# Dockerfile to build container images
+# Dockerfile to build container virome pipeline image
 # Based on Ubuntu
 ############################################################ 
+
+# Docker 1.9.1 currently hangs when attempting to build openjdk-6-jre.
+# Upgrade Docker by installing DockerToolbox-1.10.0-rc3.
 
 FROM ubuntu:trusty
 
@@ -29,13 +32,7 @@ RUN apt-get update && apt-get install -y \
 	dh-make-perl \
 	apache2 \
 	openjdk-6-jre \
-  && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
-
-#--------------------------------------------------------------------------------
-# JAVA
-
-# Docker 1.9.1 currently hangs when attempting to build openjdk6-jre.
 
 #--------------------------------------------------------------------------------
 # PERL for ergatis
@@ -57,28 +54,15 @@ RUN apt-get update && apt-get install -y \
 	libxml-rss-perl \
 	libxml-twig-perl \
 	libxml-writer-perl \
-  && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
-RUN cpanm \
-	File::Mirror \
-	Log::Cabin
+COPY lib/lib*.deb /tmp/
 
-### 	Class::Struct \
-### 	Data::Dumper \
-### #	DB_File \
-### 	ExtUtils::MakeMaker \
-### 	File::Basename \
-### 	File::Copy \
-### 	File::Find \
-### 	File::Path \
-### 	Getopt::Long \
-### 	IO::File \
-### 	IPC::Open3 \
-### 	LWP::Simple \
-### 	Mail::Mailer \
-### 	Storable \
-### 	URI::Escape
+RUN dpkg -i \
+	/tmp/libfile-mirror-perl_0.10-1_all.deb \
+	/tmp/liblog-cabin-perl_0.06-1_all.deb \
+  && rm /tmp/libfile-mirror-perl_0.10-1_all.deb \
+	/tmp/liblog-cabin-perl_0.06-1_all.deb
 
 # BMSL perl module (not in CPAN)
 
@@ -86,12 +70,13 @@ RUN mkdir -p /usr/src/bmsl
 WORKDIR /usr/src/bmsl
 
 RUN curl -SL $BMSL_DOWNLOAD_URL -o bmsl.tar.gz \
-	&& tar -xvf bmsl.tar.gz -C /usr/src/bmsl --strip-components=1 \
+	&& tar --strip-components=1 -xvf bmsl.tar.gz -C /usr/src/bmsl \
 	&& rm bmsl.tar.gz \
 	&& mkdir -p /opt/ergatis/docs \
 	&& perl Makefile.PL INSTALL_BASE=/opt/ergatis SCHEMA_DOCS_DIR=/opt/ergatis/docs \
 	&& make \
-	&& make install
+	&& make install \
+	&& /bin/rm -rf /usr/src/bmsl
 
 #--------------------------------------------------------------------------------
 # ERGATIS
@@ -100,7 +85,7 @@ RUN mkdir -p /usr/src/ergatis
 WORKDIR /usr/src/ergatis
 
 RUN curl -SL $ERGATIS_DOWNLOAD_URL -o ergatis.tar.gz \
-	&& tar -xvf ergatis.tar.gz -C /usr/src/ergatis --strip-components=1 \
+	&& tar --strip-components=1 -xvf ergatis.tar.gz -C /usr/src/ergatis \
 	&& rm ergatis.tar.gz \
 	&& cd /usr/src/ergatis/install \
 	&& mkdir -p /opt/ergatis \
@@ -111,7 +96,10 @@ RUN curl -SL $ERGATIS_DOWNLOAD_URL -o ergatis.tar.gz \
 	&& mv /usr/src/ergatis/htdocs /var/www/html/ergatis \
 	&& cp -pr /usr/src/ergatis/lib/* /opt/ergatis/lib/perl5/. \
 	&& groupadd ergatis \
-	&& useradd -g ergatis --shell /bin/bash ergatis
+	&& useradd -g ergatis --shell /bin/bash ergatis \
+	&& /bin/rm -rf /usr/src/ergatis
+
+COPY ergatis.ini /var/www/html/ergatis/cgi/.
 
 #--------------------------------------------------------------------------------
 # WORKFLOW
@@ -124,19 +112,20 @@ COPY workflow.deploy.answers /tmp/.
 RUN curl -SL $WORKFLOW_DOWNLOAD_URL -o workflow.tar.gz \
 	&& tar -xvf workflow.tar.gz -C /usr/src/workflow \
 	&& rm workflow.tar.gz \
-	&& cd /usr/src/workflow \
-	&& ./deploy.sh < /tmp/workflow.deploy.answers
+	&& mkdir -p /opt/workflow/server-conf \
+	&& chmod 777 /opt/workflow/server-conf \
+	&& ./deploy.sh < /tmp/workflow.deploy.answers \
+	&& /bin/rm -rf /usr/src/workflow /tmp/workflow.deploy.answers
 
 #--------------------------------------------------------------------------------
 # VIROME
 
-RUN mkdir /usr/src/virome
-WORKDIR /usr/src/virome
+RUN mkdir /opt/virome
+WORKDIR /opt/virome
 
 RUN curl -SL $VIROME_DOWNLOAD_URL -o virome.tar.gz \
-	&& tar -xvf virome.tar.gz -C /usr/src/virome --strip-components=1 \
-	&& rm virome.tar.gz \
-	&& cd /usr/src/virome 
+	&& tar --strip-components=1 -xvf virome.tar.gz -C /opt/virome \
+	&& rm virome.tar.gz
 
 #--------------------------------------------------------------------------------
 # APACHE
@@ -149,7 +138,7 @@ ENV APACHE_PID_FILE /var/run/apache2.pid
 ENV APACHE_RUN_DIR /var/run/apache2
 ENV APACHE_LOCK_DIR /var/lock/apache2
 
-#ENV PERL5LIB /opt/ergatis/lib/perl5
+ENV PERL5LIB /opt/ergatis/lib/perl5
 
 RUN a2enmod cgid
 
