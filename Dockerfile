@@ -22,6 +22,18 @@ ENV WORKFLOW_DOWNLOAD_URL http://sourceforge.net/projects/tigr-workflow/files/ti
 ENV VIROME_VERSION 1.0
 ENV VIROME_DOWNLOAD_URL https://github.com/bjaysheel/virome_pipeline/archive/$VIROME_VERSION.tar.gz
 
+ENV CD_HIT_VERSION 4.6.4
+ENV CD_HIT_DOWNLOAD_URL https://github.com/weizhongli/cdhit/archive/V${CD_HIT_VERSION}.tar.gz
+
+ENV MGA_VERSION noversion
+ENV MGA_DOWNLOAD_URL http://metagene.nig.ac.jp/metagene/mga_x86_64.tar.gz
+
+ENV NCBI_BLAST_VERSION 2.3.0
+ENV NCBI_BLAST_DOWNLOAD_URL ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ncbi-blast-${NCBI_BLAST_VERSION}+-x64-linux.tar.gz
+
+ENV TRNASCAN_SE_VERSION 1.3.1
+ENV TRNASCAN_SE_DOWNLOAD_URL http://lowelab.ucsc.edu/software/tRNAscan-SE-${TRNASCAN_SE_VERSION}.tar.gz
+
 #--------------------------------------------------------------------------------
 # BASICS
 
@@ -64,6 +76,7 @@ RUN dpkg -i \
   && rm /tmp/libfile-mirror-perl_0.10-1_all.deb \
 	/tmp/liblog-cabin-perl_0.06-1_all.deb
 
+#--------------------------------------------------------------------------------
 # BMSL perl module (not in CPAN)
 
 RUN mkdir -p /usr/src/bmsl
@@ -75,14 +88,15 @@ RUN curl -SL $BMSL_DOWNLOAD_URL -o bmsl.tar.gz \
 	&& mkdir -p /opt/ergatis/docs \
 	&& perl Makefile.PL INSTALL_BASE=/opt/ergatis SCHEMA_DOCS_DIR=/opt/ergatis/docs \
 	&& make \
-	&& make install \
-	&& /bin/rm -rf /usr/src/bmsl
+	&& make install
 
 #--------------------------------------------------------------------------------
 # ERGATIS
 
 RUN mkdir -p /usr/src/ergatis
 WORKDIR /usr/src/ergatis
+
+COPY ergatis.software.config /tmp/.
 
 RUN curl -SL $ERGATIS_DOWNLOAD_URL -o ergatis.tar.gz \
 	&& tar --strip-components=1 -xvf ergatis.tar.gz -C /usr/src/ergatis \
@@ -95,9 +109,10 @@ RUN curl -SL $ERGATIS_DOWNLOAD_URL -o ergatis.tar.gz \
 	&& make install \
 	&& mv /usr/src/ergatis/htdocs /var/www/html/ergatis \
 	&& cp -pr /usr/src/ergatis/lib/* /opt/ergatis/lib/perl5/. \
+	&& cp /opt/ergatis/software.config /opt/ergatis/software.config.orig \
+	&& cp /tmp/ergatis.software.config /opt/ergatis/software.config \
 	&& groupadd ergatis \
-	&& useradd -g ergatis --shell /bin/bash ergatis \
-	&& /bin/rm -rf /usr/src/ergatis
+	&& useradd -g ergatis --shell /bin/bash ergatis
 
 COPY ergatis.ini /var/www/html/ergatis/cgi/.
 
@@ -114,8 +129,7 @@ RUN curl -SL $WORKFLOW_DOWNLOAD_URL -o workflow.tar.gz \
 	&& rm workflow.tar.gz \
 	&& mkdir -p /opt/workflow/server-conf \
 	&& chmod 777 /opt/workflow/server-conf \
-	&& ./deploy.sh < /tmp/workflow.deploy.answers \
-	&& /bin/rm -rf /usr/src/workflow /tmp/workflow.deploy.answers
+	&& ./deploy.sh < /tmp/workflow.deploy.answers
 
 #--------------------------------------------------------------------------------
 # VIROME
@@ -123,9 +137,74 @@ RUN curl -SL $WORKFLOW_DOWNLOAD_URL -o workflow.tar.gz \
 RUN mkdir /opt/virome
 WORKDIR /opt/virome
 
+COPY virome.software.config /tmp/.
+
 RUN curl -SL $VIROME_DOWNLOAD_URL -o virome.tar.gz \
 	&& tar --strip-components=1 -xvf virome.tar.gz -C /opt/virome \
-	&& rm virome.tar.gz
+	&& /bin/rm -rf /opt/virome/software/* /opt/virome/autopipe_package/ergatis \
+	&& rm virome.tar.gz \
+	&& cp /opt/virome/software.config /opt/virome/software.config.orig \
+	&& cp /tmp/virome.software.config /opt/virome/software.config
+
+#--------------------------------------------------------------------------------
+# CD-HIT
+
+RUN mkdir -p /usr/src/cd-hit
+WORKDIR /usr/src/cd-hit
+
+RUN curl -SL $CD_HIT_DOWNLOAD_URL -o cd-hit.tar.gz \
+	&& tar --strip-components=1 -xvf cd-hit.tar.gz -C /usr/src/cd-hit \
+	&& rm cd-hit.tar.gz \
+	&& mkdir -p /opt/cd-hit/bin \
+	&& make \
+	&& mv cd-hit-est-2d cd-hit-div cd-hit-2d cd-hit-est cd-hit *.pl /opt/cd-hit/bin/.
+
+#--------------------------------------------------------------------------------
+# MGA
+
+RUN mkdir -p /usr/src/mga
+WORKDIR /usr/src/mga
+
+RUN curl -SL $MGA_DOWNLOAD_URL -o mga.tar.gz \
+	&& tar -xvf mga.tar.gz -C /usr/src/mga \
+	&& rm mga.tar.gz \
+	&& mkdir -p /opt/mga/bin \
+	&& mv README /opt/mga/. \
+	&& mv mga_linux_ia64 /opt/mga/bin/mga
+
+#--------------------------------------------------------------------------------
+# NCBI-BLAST+
+
+RUN mkdir -p /usr/src/ncbi-blast+
+WORKDIR /usr/src/ncbi-blast+
+
+RUN curl -SL $NCBI_BLAST_DOWNLOAD_URL -o ncbi-blast+.tar.gz \
+	&& tar --strip-components=1 -xvf ncbi-blast+.tar.gz -C /usr/src/ncbi-blast+ \
+	&& rm ncbi-blast+.tar.gz \
+	&& mkdir -p /opt/ncbi-blast+ \
+	&& mv * /opt/ncbi-blast+/.
+
+#--------------------------------------------------------------------------------
+# TRNASCAN-SE
+
+RUN mkdir -p /usr/src/trnascan-se
+WORKDIR /usr/src/trnascan-se
+
+RUN curl -SL $TRNASCAN_SE_DOWNLOAD_URL -o trnascan-se.tar.gz \
+	&& tar --strip-components=1 -xvf trnascan-se.tar.gz -C /usr/src/trnascan-se \
+	&& rm trnascan-se.tar.gz \
+	&& sed -i -e 's/..HOME./\/opt\/trnascan-se/' Makefile \
+	&& make \
+	&& make install
+
+#--------------------------------------------------------------------------------
+# Cleanup
+
+WORKDIR /usr/src
+RUN /bin/rm -rf /usr/src/* \
+	&& rm /tmp/ergatis.software.config \
+	&& rm /tmp/virome.software.config \
+	&& rm /tmp/workflow.deploy.answers
 
 #--------------------------------------------------------------------------------
 # APACHE
