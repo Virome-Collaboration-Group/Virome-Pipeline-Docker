@@ -59,6 +59,7 @@ RUN apt-get update && apt-get install -y \
 	libfile-spec-perl \
 	libhtml-template-perl \
 	libio-tee-perl \
+	libjson-perl \
 	liblog-log4perl-perl \
 	libmath-combinatorics-perl \
 	libperlio-gzip-perl \
