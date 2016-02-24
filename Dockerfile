@@ -201,11 +201,27 @@ RUN curl -SL $TRNASCAN_SE_DOWNLOAD_URL -o trnascan-se.tar.gz \
 #--------------------------------------------------------------------------------
 # Cleanup
 
-WORKDIR /usr/src
-RUN /bin/rm -rf /usr/src/* \
-	&& rm /tmp/ergatis.software.config \
-	&& rm /tmp/virome.software.config \
-	&& rm /tmp/workflow.deploy.answers
+#WORKDIR /usr/src
+#RUN /bin/rm -rf /usr/src/* \
+#	&& rm /tmp/ergatis.software.config \
+#	&& rm /tmp/virome.software.config \
+#	&& rm /tmp/workflow.deploy.answers
+
+#--------------------------------------------------------------------------------
+# Testing
+
+RUN mkdir /usr/local/scratch \
+	&& chmod 777 /usr/local/scratch \
+	&& mkdir /usr/local/scratch/workflow \
+	&& chmod 777 /usr/local/scratch/workflow \
+	&& mkdir /usr/local/scratch/workflow/scripts \
+	&& chmod 777 /usr/local/scratch/workflow/scripts \
+	&& mkdir /usr/local/projects \
+	&& chmod 777 /usr/local/projects \
+	&& mkdir /usr/local/projects/temmel \
+	&& chmod 777 /usr/local/projects/temmel \
+	&& chmod 777 /opt/ergatis/software.config \
+	&& chmod 777 /var/www/html/ergatis/cgi/ergatis.ini
 
 #--------------------------------------------------------------------------------
 # APACHE
