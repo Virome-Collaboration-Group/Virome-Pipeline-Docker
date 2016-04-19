@@ -1,0 +1,14 @@
+<commandSetRoot xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="commandSet.xsd" type="instance">
+    <commandSet type="serial">
+        <state>incomplete</state>
+        <name>start</name>
+        <commandSet type="serial">
+            <state>incomplete</state>
+            <name>fasta_size_filter.default</name>
+        </commandSet>
+        <commandSet type="serial">
+            <state>incomplete</state>
+            <name>cd-hit-454.default</name>
+        </commandSet>
+    </commandSet>
+</commandSetRoot>
