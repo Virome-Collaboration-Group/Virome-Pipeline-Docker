@@ -25,7 +25,7 @@ B<--output_directory,-o>
     Defaults to current directory.
 
 B<--input_file, -i>
-    The name of the input file to pass to the QC portion of the pipeline.
+    The path of the input file to pass to the QC portion of the pipeline.
     If it ends in .list, that will be passed as an iterable list of files.
 
 B<--library_id, -l>
@@ -190,14 +190,14 @@ add_config( \%config, $pipelines->{'qc'});  # fortunately we can use one config 
 add_config(\%config, $pipelines->{'core'});
 
 $config{"global"}->{'$;ENVIRONMENT$;'} = $options{env};
-$config{"global"}->{'$;ABBR;'} = $options{abbr};
-$config{"global"}->{'$;LIBARY_ID;'} = $options{library_id};
+$config{"global"}->{'$;ABBR$;'} = $options{abbr};
+$config{"global"}->{'$;LIBARY_ID$;'} = $options{library_id};
 
 
 if ($options{input_file} =~ /list$/) {
-    $config{"global"}->{'$;INPUT_LIST;'} = $options{input_file};
+    $config{"global"}->{'$;INPUT_LIST$;'} = $options{input_file};
 } else {
-    $config{"global"}->{'$;I_FILE;'} = $options{input_file};
+    $config{"global"}->{'$;I_FILE$;'} = $options{input_file};
 }
 
 if ($options{pre_assembled}) {
