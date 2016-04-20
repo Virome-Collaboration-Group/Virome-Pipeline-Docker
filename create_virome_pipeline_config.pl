@@ -26,7 +26,6 @@ B<--output_directory,-o>
 
 B<--input_file, -i>
     The name of the input file to pass to the QC portion of the pipeline.
-
     If it ends in .list, that will be passed as an iterable list of files.
 
 B<--library_id, -l>
@@ -40,19 +39,15 @@ B<--abbr, -a>
 
 B<--pre_assembled>
     If set to 1, pipeline input is assumed to have been already assembled.
-
     If set to 0 (default) assembly of reads will take place
-
     NOTE:: --input_type and --454 will be ignored if this is set to 1
 
 B<--pyro_454>
     If set to 1, will use CD-HIT to align 454 pyrosequencing reads into OTU clusters
-
     If set to 0 (default), will not do OTU clustering
 
 B<--input_type>
     Determines what type of file the input is in.  Choose from [none(default), fasta, fastq, or sff]
-
     NOTE:: SFF is only possible when --pyro_454 is enabled...otherwise it is ignored.
 
 B<--log,-L>
