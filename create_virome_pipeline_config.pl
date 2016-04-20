@@ -24,19 +24,33 @@ B<--output_directory,-o>
     The directory of where to write the output pipeline.layout and pipeline.config file.
     Defaults to current directory.
 
-B<--pre_assembled, -a>
+B<--input_file, -i>
+    The name of the input file to pass to the QC portion of the pipeline.
+
+    If it ends in .list, that will be passed as an iterable list of files.
+
+B<--library_id, -l>
+    The id number of the library you are running.
+
+B<--env, -e>
+    The environment that this pipeline is running at.
+
+B<--abbr, -a>
+    The three letter prefix for the library.
+
+B<--pre_assembled>
     If set to 1, pipeline input is assumed to have been already assembled.
 
     If set to 0 (default) assembly of reads will take place
 
     NOTE:: --input_type and --454 will be ignored if this is set to 1
 
-B<--pyro_454, -p>
+B<--pyro_454>
     If set to 1, will use CD-HIT to align 454 pyrosequencing reads into OTU clusters
 
     If set to 0 (default), will not do OTU clustering
 
-B<--input_type, -i>
+B<--input_type>
     Determines what type of file the input is in.  Choose from [none(default), fasta, fastq, or sff]
 
     NOTE:: SFF is only possible when --pyro_454 is enabled...otherwise it is ignored.
@@ -113,9 +127,13 @@ my %options;
 my $results = GetOptions (\%options,
 						  "template_directory|t=s",
 						  "output_directory|o=s",
-                          "pre_assembled|a=i",
-                          "pyro_454|p=i",
-                          "input_type|i=s",
+                          "input_file|i=s",
+                          "library_id|l=s",
+                          "env|e=s",
+                          "abbr|a=s",
+                          "pre_assembled=i",
+                          "pyro_454=i",
+                          "input_type=s",
 						  "log|L=s",
 						  "debug|d=s",
 						  "help|h"
@@ -173,38 +191,35 @@ my %config;
 
 # Write the pipeline config file
 add_config( \%config, $pipelines->{'init'});
-### QC block ###
-if ($options{'pre_assembled'}) {
-   add_config(\%config, $pipelines->{'qc'}, "pipeline.preassembled.config");
-} elsif ($options{'pyro_454'}) {
-   # If the input is not pre_assembled we check to see if it needs OTU clustering
-   if ($input_type eq 'sff') {
-       add_config(\%config, $pipelines->{'qc'}, "pipeline.sff.config");
-   } elsif ($input_type eq 'fasta') {
-       add_config(\%config, $pipelines->{'qc'}, "pipeline.454_fasta.config");
-   } elsif ($input_type eq 'fastq') {
-      add_config(\%config, $pipelines->{'qc'}, "pipeline.454_fastq.config");
-   } else {
-       &_log($ERROR, "We should never see this condition... something in the layout file QC block is wonky.");
-   }
-} else {
-   # Neither --pre_assembled, nor --pyro_454 were passed
-   if ($input_type eq 'fasta') {
-       # this scenario uses the same QC components as the --pre_assembled option
-      add_config(\%config, $pipelines->{'qc'}, "pipeline.preassembled.config");
-   } elsif ($input_type eq 'fastq') {
-       add_config(\%config, $pipelines->{'qc'}, "pipeline.no_454_fastq.config");
-   } else {
-       &_log($ERROR, "We should never see this condition... something in the layout file QC block is wonky.");
-
-   }
-}
-### end QC block ###
+add_config( \%config, $pipelines->{'qc'});  # fortunately we can use one config for all the variations
 add_config(\%config, $pipelines->{'core'});
 
-# TODO:: Editing the config files for each template
-#        Making a similar QC block for this config section
-#        Figure out if nt_fasta_check_default needs editing
+$config{"global"}->{'$;ENVIRONMENT$;'} = $options{env};
+$config{"global"}->{'$;ABBR;'} = $options{abbr};
+$config{"global"}->{'$;LIBARY_ID;'} = $options{library_id};
+
+
+if ($options{input_file} =~ /list$/) {
+    $config{"global"}->{'$;INPUT_LIST;'} = $options{input_file};
+} else {
+    $config{"global"}->{'$;I_FILE;'} = $options{input_file};
+}
+
+if ($options{pre_assembled}) {
+    $config{"nt_fasta_check default"}->{'$;INPUT_FILE_LIST$;'} = '$;REPOSITORY_ROOT$;/output_repository/fasta_size_filter/$;PIPELINEID$;_default/fasta_size_filter.fsa.list';
+} elsif ($options{pyro_454}) {
+    $config{"nt_fasta_check default"}->{'$;INPUT_FILE_LIST$;'} = '$;REPOSITORY_ROOT$;/output_repository/cd-hit-454/$;PIPELINEID$;_default/cd-hit-454.fsa.list';
+} else {
+    if ($input_type eq 'fasta') {
+        # this scenario uses the same QC components as the --pre_assembled option
+        $config{"nt_fasta_check default"}->{'$;INPUT_FILE_LIST$;'} = '$;REPOSITORY_ROOT$;/output_repository/fasta_size_filter/$;PIPELINEID$;_default/fasta_size_filter.fsa.list';
+    } elsif ($input_type eq 'fastq') {
+        $config{"nt_fasta_check default"}->{'$;INPUT_FILE_LIST$;'} = '$;REPOSITORY_ROOT$;/output_repository/QC_filter/$;PIPELINEID$;_default/QC_filter.fsa.list';
+    } else {
+        &_log($ERROR, "We should have never gotten to his condition so something is wonky.");
+    }
+}
+
 
 # open config file for writing
 open( my $pcfh, "> $pipeline_config") or &_log($ERROR, "Could not open $pipeline_config for writing: $!");
@@ -306,6 +321,10 @@ sub check_options {
 
    &_pod if( $opts->{'help'} );
    open( $logfh, "> $opts->{'log'}") or die("Can't open log file ($!)") if( $opts->{'log'} );
+
+   foreach my $req ( qw(input_file library_id env abbr) ) {
+       &_log($ERROR, "Option $req is required") unless( $opts->{$req} );
+   }
 
    $outdir = $opts->{'output_directory'} if( $opts->{'output_directory'} );
    $template_directory = $opts->{'template_directory'} if( $opts->{'template_directory'} );
