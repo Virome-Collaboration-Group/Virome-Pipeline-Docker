@@ -184,11 +184,12 @@ $layout_writer->end();
 
 my %config;
 
-# Write the pipeline config file
+# Take the config files from each pipeline template and add to a hash
 add_config( \%config, $pipelines->{'init'});
 add_config( \%config, $pipelines->{'qc'});  # fortunately we can use one config for all the variations
 add_config(\%config, $pipelines->{'core'});
 
+# Assign values to the hash keys based on arguments
 $config{"global"}->{'$;ENVIRONMENT$;'} = $options{env};
 $config{"global"}->{'$;ABBR$;'} = $options{abbr};
 $config{"global"}->{'$;LIBARY_ID$;'} = $options{library_id};
@@ -200,6 +201,7 @@ if ($options{input_file} =~ /list$/) {
     $config{"global"}->{'$;I_FILE$;'} = $options{input_file};
 }
 
+# Now change the starting 'core' template input list origin based on our decision tree
 if ($options{pre_assembled}) {
     $config{"nt_fasta_check default"}->{'$;INPUT_FILE_LIST$;'} = '$;REPOSITORY_ROOT$;/output_repository/fasta_size_filter/$;PIPELINEID$;_default/fasta_size_filter.fsa.list';
 } elsif ($options{pyro_454}) {
@@ -226,9 +228,10 @@ write_config( \%config, $pcfh );
 close($plfh);
 close($pcfh);
 
-
 print "Wrote $pipeline_layout and $pipeline_config\n";
+exit(0);
 
+### SUBROUTINES ###
 sub write_config {
     my ($config, $fh) = @_;
 
