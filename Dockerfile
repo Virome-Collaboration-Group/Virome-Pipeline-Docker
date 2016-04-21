@@ -6,6 +6,8 @@
 # Docker 1.9.1 currently hangs when attempting to build openjdk-6-jre.
 # Upgrade Docker by installing DockerToolbox-1.10.0-rc3.
 
+# docker run -ti -v /home/temmel/tmp/input:/tmp/input -v /home/temmel/tmp/output:/tmp/output -v /home/temmel/tmp/projects:/usr/local/projects virome:1.0
+
 FROM ubuntu:trusty
 
 MAINTAINER Tom Emmel <temmel@som.umaryland.edu>
@@ -44,6 +46,8 @@ RUN apt-get update && apt-get install -y \
 	dh-make-perl \
 	apache2 \
 	openjdk-6-jre \
+	zip \
+	zsync \
   && rm -rf /var/lib/apt/lists/*
 
 #--------------------------------------------------------------------------------
@@ -98,18 +102,18 @@ RUN mkdir -p /usr/src/ergatis
 WORKDIR /usr/src/ergatis
 
 COPY ergatis.software.config /tmp/.
+COPY ergatis.install.fix /tmp/.
 
 RUN curl -SL $ERGATIS_DOWNLOAD_URL -o ergatis.tar.gz \
 	&& tar --strip-components=1 -xvf ergatis.tar.gz -C /usr/src/ergatis \
 	&& rm ergatis.tar.gz \
-	&& cd /usr/src/ergatis/install \
 	&& mkdir -p /opt/ergatis \
-	&& perl Makefile.PL LIVE_BUILD INSTALL_BASE=/opt/ergatis \
-	&& sed -i -e 's/..BUILD_DIR..R/..\/src\/R/' Makefile \
+	&& cp /tmp/ergatis.install.fix . \
+	&& ./ergatis.install.fix \
+	&& perl Makefile.PL INSTALL_BASE=/opt/ergatis \
 	&& make \
 	&& make install \
 	&& mv /usr/src/ergatis/htdocs /var/www/html/ergatis \
-	&& cp -pr /usr/src/ergatis/lib/* /opt/ergatis/lib/perl5/. \
 	&& cp /opt/ergatis/software.config /opt/ergatis/software.config.orig \
 	&& cp /tmp/ergatis.software.config /opt/ergatis/software.config \
 	&& groupadd ergatis \
@@ -199,6 +203,12 @@ RUN curl -SL $TRNASCAN_SE_DOWNLOAD_URL -o trnascan-se.tar.gz \
 	&& make install
 
 #--------------------------------------------------------------------------------
+# Data 
+
+#WORKDIR /tmp
+#RUN zsync http://temmel-lx.igs.umaryland.edu:8090/virome/hello.zsync
+
+#--------------------------------------------------------------------------------
 # Cleanup
 
 #WORKDIR /usr/src
@@ -208,20 +218,31 @@ RUN curl -SL $TRNASCAN_SE_DOWNLOAD_URL -o trnascan-se.tar.gz \
 #	&& rm /tmp/workflow.deploy.answers
 
 #--------------------------------------------------------------------------------
+# Configure
+
+RUN echo "virome = /usr/local/projects/virome" >> /var/www/html/ergatis/cgi/ergatis.ini
+
+#--------------------------------------------------------------------------------
 # Testing
 
-RUN mkdir /usr/local/scratch \
-	&& chmod 777 /usr/local/scratch \
-	&& mkdir /usr/local/scratch/workflow \
-	&& chmod 777 /usr/local/scratch/workflow \
-	&& mkdir /usr/local/scratch/workflow/scripts \
-	&& chmod 777 /usr/local/scratch/workflow/scripts \
-	&& mkdir /usr/local/projects \
-	&& chmod 777 /usr/local/projects \
-	&& mkdir /usr/local/projects/temmel \
-	&& chmod 777 /usr/local/projects/temmel \
-	&& chmod 777 /opt/ergatis/software.config \
-	&& chmod 777 /var/www/html/ergatis/cgi/ergatis.ini
+RUN mkdir /usr/local/scratch && chmod 777 /usr/local/scratch \
+	&& mkdir /usr/local/scratch/ergatis && chmod 777 /usr/local/scratch/ergatis \
+	&& mkdir /usr/local/scratch/ergatis/archival && chmod 777 /usr/local/scratch/ergatis/archival \
+	&& mkdir /usr/local/scratch/workflow && chmod 777 /usr/local/scratch/workflow \
+	&& mkdir /usr/local/scratch/workflow/id_repository && chmod 777 /usr/local/scratch/workflow/id_repository \
+	&& mkdir /usr/local/scratch/workflow/runtime && chmod 777 /usr/local/scratch/workflow/runtime \
+	&& mkdir /usr/local/scratch/workflow/runtime/pipeline && chmod 777 /usr/local/scratch/workflow/runtime/pipeline \
+	&& mkdir /usr/local/scratch/workflow/scripts && chmod 777 /usr/local/scratch/workflow/scripts
+
+RUN chmod 777 /opt/ergatis/software.config
+
+RUN mkdir /opt/ergatis/global_id_repository && chmod 777 /opt/ergatis/global_id_repository \
+	&& mkdir /opt/ergatis/global_saved_templates && chmod 777 /opt/ergatis/global_saved_templates \
+	&& touch /opt/ergatis/global_id_repository/valid_id_repository
+
+#	&& chmod 777 /opt/ergatis/software.config
+
+RUN mkdir /tmp/pipelines_building && chmod 777 /tmp/pipelines_building
 
 #--------------------------------------------------------------------------------
 # APACHE
@@ -242,4 +263,34 @@ COPY 000-default.conf /etc/apache2/sites-available/000-default.conf
 
 EXPOSE 80
 
-CMD [ "/usr/sbin/apache2ctl", "-DFOREGROUND" ]
+#--------------------------------------------------------------------------------
+# Scripts
+
+ENV PERL5LIB=/opt/ergatis/lib/perl5
+
+RUN mkdir -p /opt/scripts
+WORKDIR /opt/scripts
+
+COPY virome_454_fasta_unassembled_run_pipeline.pl /opt/scripts/.
+RUN chmod 755 /opt/scripts/virome_454_fasta_unassembled_run_pipeline.pl
+
+COPY create_prok_pipeline_config.pl /opt/scripts/.
+RUN chmod 755 /opt/scripts/create_prok_pipeline_config.pl
+
+COPY run_prok_pipeline.pl /opt/scripts/.
+RUN chmod 755 /opt/scripts/run_prok_pipeline.pl
+
+COPY wrapper.sh /opt/scripts/wrapper.sh
+RUN chmod 755 /opt/scripts/wrapper.sh
+
+COPY project.config /tmp/.
+COPY file.fasta /tmp/.
+
+#--------------------------------------------------------------------------------
+# Default Command
+
+#CMD [ "/usr/sbin/apache2ctl", "-DFOREGROUND" ]
+
+#CMD [ "/usr/bin/timeout", "30", "/opt/scripts/wrapper.sh" ]
+
+CMD [ "/opt/scripts/wrapper.sh" ]
