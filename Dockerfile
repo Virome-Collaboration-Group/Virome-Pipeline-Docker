@@ -6,11 +6,12 @@
 # Docker 1.9.1 currently hangs when attempting to build openjdk-6-jre.
 # Upgrade Docker by installing DockerToolbox-1.10.0-rc3.
 
-# docker run -ti -v /home/temmel/tmp/input:/tmp/input -v /home/temmel/tmp/output:/tmp/output -v /home/temmel/tmp/projects:/usr/local/projects virome:1.0
-
 FROM ubuntu:trusty
 
 MAINTAINER Tom Emmel <temmel@som.umaryland.edu>
+
+#--------------------------------------------------------------------------------
+# SOFTWARE
 
 ENV BMSL_VERSION v2r18b1
 ENV BMSL_DOWNLOAD_URL http://sourceforge.net/projects/bsml/files/bsml/bsml-$BMSL_VERSION/bsml-$BMSL_VERSION.tar.gz
@@ -22,7 +23,7 @@ ENV WORKFLOW_VERSION 3.1.5
 ENV WORKFLOW_DOWNLOAD_URL http://sourceforge.net/projects/tigr-workflow/files/tigr-workflow/wf-$WORKFLOW_VERSION.tar.gz
 
 ENV VIROME_VERSION 1.0
-ENV VIROME_DOWNLOAD_URL https://github.com/bjaysheel/virome_pipeline/archive/$VIROME_VERSION.tar.gz
+ENV VIROME_DOWNLOAD_URL https://github.com/Virome-Collaboration-Group/virome_pipeline/archive/master.zip
 
 ENV CD_HIT_VERSION 4.6.4
 ENV CD_HIT_DOWNLOAD_URL https://github.com/weizhongli/cdhit/archive/V${CD_HIT_VERSION}.tar.gz
@@ -46,6 +47,7 @@ RUN apt-get update && apt-get install -y \
 	dh-make-perl \
 	apache2 \
 	openjdk-6-jre \
+	ncbi-blast+ \
 	zip \
 	zsync \
   && rm -rf /var/lib/apt/lists/*
@@ -82,47 +84,7 @@ RUN dpkg -i \
 	/tmp/liblog-cabin-perl_0.06-1_all.deb
 
 #--------------------------------------------------------------------------------
-# BMSL perl module (not in CPAN)
-
-RUN mkdir -p /usr/src/bmsl
-WORKDIR /usr/src/bmsl
-
-RUN curl -SL $BMSL_DOWNLOAD_URL -o bmsl.tar.gz \
-	&& tar --strip-components=1 -xvf bmsl.tar.gz -C /usr/src/bmsl \
-	&& rm bmsl.tar.gz \
-	&& mkdir -p /opt/ergatis/docs \
-	&& perl Makefile.PL INSTALL_BASE=/opt/ergatis SCHEMA_DOCS_DIR=/opt/ergatis/docs \
-	&& make \
-	&& make install
-
-#--------------------------------------------------------------------------------
-# ERGATIS
-
-RUN mkdir -p /usr/src/ergatis
-WORKDIR /usr/src/ergatis
-
-COPY ergatis.software.config /tmp/.
-COPY ergatis.install.fix /tmp/.
-
-RUN curl -SL $ERGATIS_DOWNLOAD_URL -o ergatis.tar.gz \
-	&& tar --strip-components=1 -xvf ergatis.tar.gz -C /usr/src/ergatis \
-	&& rm ergatis.tar.gz \
-	&& mkdir -p /opt/ergatis \
-	&& cp /tmp/ergatis.install.fix . \
-	&& ./ergatis.install.fix \
-	&& perl Makefile.PL INSTALL_BASE=/opt/ergatis \
-	&& make \
-	&& make install \
-	&& mv /usr/src/ergatis/htdocs /var/www/html/ergatis \
-	&& cp /opt/ergatis/software.config /opt/ergatis/software.config.orig \
-	&& cp /tmp/ergatis.software.config /opt/ergatis/software.config \
-	&& groupadd ergatis \
-	&& useradd -g ergatis --shell /bin/bash ergatis
-
-COPY ergatis.ini /var/www/html/ergatis/cgi/.
-
-#--------------------------------------------------------------------------------
-# WORKFLOW
+# WORKFLOW -- install in /opt/workflow
 
 RUN mkdir /usr/src/workflow
 WORKDIR /usr/src/workflow
@@ -137,60 +99,33 @@ RUN curl -SL $WORKFLOW_DOWNLOAD_URL -o workflow.tar.gz \
 	&& ./deploy.sh < /tmp/workflow.deploy.answers
 
 #--------------------------------------------------------------------------------
-# VIROME
+# VIROME -- install in /opt/package_virome
 
-RUN mkdir /opt/virome
-WORKDIR /opt/virome
+RUN mkdir -p /opt/src/virome
+WORKDIR /opt/src/virome
 
+COPY ergatis.install.fix /tmp/.
+COPY virome.ergatis.ini /tmp/.
 COPY virome.software.config /tmp/.
 
-RUN curl -SL $VIROME_DOWNLOAD_URL -o virome.tar.gz \
-	&& tar --strip-components=1 -xvf virome.tar.gz -C /opt/virome \
-	&& /bin/rm -rf /opt/virome/software/* /opt/virome/autopipe_package/ergatis \
-	&& rm virome.tar.gz \
-	&& cp /opt/virome/software.config /opt/virome/software.config.orig \
-	&& cp /tmp/virome.software.config /opt/virome/software.config
-
-#--------------------------------------------------------------------------------
-# CD-HIT
-
-RUN mkdir -p /usr/src/cd-hit
-WORKDIR /usr/src/cd-hit
-
-RUN curl -SL $CD_HIT_DOWNLOAD_URL -o cd-hit.tar.gz \
-	&& tar --strip-components=1 -xvf cd-hit.tar.gz -C /usr/src/cd-hit \
-	&& rm cd-hit.tar.gz \
-	&& mkdir -p /opt/cd-hit/bin \
+RUN curl -SL $VIROME_DOWNLOAD_URL -o virome.zip \
+	&& unzip -o virome.zip \
+	&& rm virome.zip \
+	&& mv /opt/src/virome/virome_pipeline-master /opt/package_virome \
+	&& cd /opt/package_virome/autopipe_package/ergatis \
+	&& cp /tmp/ergatis.install.fix . \
+	&& ./ergatis.install.fix \
+	&& perl Makefile.PL INSTALL_BASE=/opt/package_virome \
 	&& make \
-	&& mv cd-hit-est-2d cd-hit-div cd-hit-2d cd-hit-est cd-hit *.pl /opt/cd-hit/bin/.
+	&& make install \
+	&& cp /tmp/virome.ergatis.ini /opt/package_virome/autopipe_package/ergatis/htdocs/cgi/ergatis.ini \
+	&& cp /tmp/virome.ergatis.ini /opt/package_virome/autopipe_package/ergatis.ini \
+	&& cp /tmp/virome.software.config /opt/package_virome/software.config
+
+RUN echo "virome = /opt/projects/virome" >> /opt/package_virome/autopipe_package/ergatis.ini
 
 #--------------------------------------------------------------------------------
-# MGA
-
-RUN mkdir -p /usr/src/mga
-WORKDIR /usr/src/mga
-
-RUN curl -SL $MGA_DOWNLOAD_URL -o mga.tar.gz \
-	&& tar -xvf mga.tar.gz -C /usr/src/mga \
-	&& rm mga.tar.gz \
-	&& mkdir -p /opt/mga/bin \
-	&& mv README /opt/mga/. \
-	&& mv mga_linux_ia64 /opt/mga/bin/mga
-
-#--------------------------------------------------------------------------------
-# NCBI-BLAST+
-
-RUN mkdir -p /usr/src/ncbi-blast+
-WORKDIR /usr/src/ncbi-blast+
-
-RUN curl -SL $NCBI_BLAST_DOWNLOAD_URL -o ncbi-blast+.tar.gz \
-	&& tar --strip-components=1 -xvf ncbi-blast+.tar.gz -C /usr/src/ncbi-blast+ \
-	&& rm ncbi-blast+.tar.gz \
-	&& mkdir -p /opt/ncbi-blast+ \
-	&& mv * /opt/ncbi-blast+/.
-
-#--------------------------------------------------------------------------------
-# TRNASCAN-SE
+# TRNASCAN-SE -- install in /opt/trnascan-se
 
 RUN mkdir -p /usr/src/trnascan-se
 WORKDIR /usr/src/trnascan-se
@@ -203,29 +138,9 @@ RUN curl -SL $TRNASCAN_SE_DOWNLOAD_URL -o trnascan-se.tar.gz \
 	&& make install
 
 #--------------------------------------------------------------------------------
-# Data 
+# SCRATCH
 
-#WORKDIR /tmp
-#RUN zsync http://temmel-lx.igs.umaryland.edu:8090/virome/hello.zsync
-
-#--------------------------------------------------------------------------------
-# Cleanup
-
-#WORKDIR /usr/src
-#RUN /bin/rm -rf /usr/src/* \
-#	&& rm /tmp/ergatis.software.config \
-#	&& rm /tmp/virome.software.config \
-#	&& rm /tmp/workflow.deploy.answers
-
-#--------------------------------------------------------------------------------
-# Configure
-
-RUN echo "virome = /usr/local/projects/virome" >> /var/www/html/ergatis/cgi/ergatis.ini
-
-#--------------------------------------------------------------------------------
-# Testing
-
-RUN mkdir /usr/local/scratch && chmod 777 /usr/local/scratch \
+RUN mkdir -p /usr/local/scratch && chmod 777 /usr/local/scratch \
 	&& mkdir /usr/local/scratch/ergatis && chmod 777 /usr/local/scratch/ergatis \
 	&& mkdir /usr/local/scratch/ergatis/archival && chmod 777 /usr/local/scratch/ergatis/archival \
 	&& mkdir /usr/local/scratch/workflow && chmod 777 /usr/local/scratch/workflow \
@@ -234,39 +149,29 @@ RUN mkdir /usr/local/scratch && chmod 777 /usr/local/scratch \
 	&& mkdir /usr/local/scratch/workflow/runtime/pipeline && chmod 777 /usr/local/scratch/workflow/runtime/pipeline \
 	&& mkdir /usr/local/scratch/workflow/scripts && chmod 777 /usr/local/scratch/workflow/scripts
 
-RUN chmod 777 /opt/ergatis/software.config
-
-RUN mkdir /opt/ergatis/global_id_repository && chmod 777 /opt/ergatis/global_id_repository \
-	&& mkdir /opt/ergatis/global_saved_templates && chmod 777 /opt/ergatis/global_saved_templates \
-	&& touch /opt/ergatis/global_id_repository/valid_id_repository
-
-#	&& chmod 777 /opt/ergatis/software.config
-
 RUN mkdir /tmp/pipelines_building && chmod 777 /tmp/pipelines_building
 
 #--------------------------------------------------------------------------------
-# APACHE
+# VIROME PROJECT
 
-ENV APACHE_RUN_USER www-data
-ENV APACHE_RUN_GROUP www-data
+COPY project.config /tmp/.
 
-ENV APACHE_LOG_DIR /var/log/apache2
-ENV APACHE_PID_FILE /var/run/apache2.pid
-ENV APACHE_RUN_DIR /var/run/apache2
-ENV APACHE_LOCK_DIR /var/lock/apache2
-
-ENV PERL5LIB /opt/ergatis/lib/perl5
-
-RUN a2enmod cgid
-
-COPY 000-default.conf /etc/apache2/sites-available/000-default.conf
-
-EXPOSE 80
+RUN mkdir -p /opt/projects/virome \
+	&& mkdir /opt/projects/virome/output_repository \
+	&& mkdir /opt/projects/virome/virome-cache-files \
+	&& mkdir /opt/projects/virome/software \
+	&& mkdir /opt/projects/virome/workflow \
+	&& mkdir /opt/projects/virome/workflow/lock_files \
+	&& mkdir /opt/projects/virome/workflow/project_id_repository \
+	&& mkdir /opt/projects/virome/workflow/runtime \
+	&& mkdir /opt/projects/virome/workflow/runtime/pipeline \
+	&& touch /opt/projects/virome/workflow/project_id_repository/valid_id_repository \
+        && cp /tmp/project.config /opt/projects/virome/workflow/.
 
 #--------------------------------------------------------------------------------
 # Scripts
 
-ENV PERL5LIB=/opt/ergatis/lib/perl5
+ENV PERL5LIB=/opt/package_virome/autopipe_package/ergatis/lib
 
 RUN mkdir -p /opt/scripts
 WORKDIR /opt/scripts
@@ -274,23 +179,12 @@ WORKDIR /opt/scripts
 COPY virome_454_fasta_unassembled_run_pipeline.pl /opt/scripts/.
 RUN chmod 755 /opt/scripts/virome_454_fasta_unassembled_run_pipeline.pl
 
-COPY create_prok_pipeline_config.pl /opt/scripts/.
-RUN chmod 755 /opt/scripts/create_prok_pipeline_config.pl
-
-COPY run_prok_pipeline.pl /opt/scripts/.
-RUN chmod 755 /opt/scripts/run_prok_pipeline.pl
-
 COPY wrapper.sh /opt/scripts/wrapper.sh
 RUN chmod 755 /opt/scripts/wrapper.sh
 
-COPY project.config /tmp/.
 COPY file.fasta /tmp/.
 
 #--------------------------------------------------------------------------------
 # Default Command
-
-#CMD [ "/usr/sbin/apache2ctl", "-DFOREGROUND" ]
-
-#CMD [ "/usr/bin/timeout", "30", "/opt/scripts/wrapper.sh" ]
 
 CMD [ "/opt/scripts/wrapper.sh" ]
