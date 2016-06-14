@@ -10,6 +10,10 @@ FROM ubuntu:trusty
 
 MAINTAINER Tom Emmel <temmel@som.umaryland.edu>
 
+# Handle warnings from apt/dpkg
+ARG TERM=linux
+ARG DEBIAN_FRONTEND=noninteractive
+
 #--------------------------------------------------------------------------------
 # SOFTWARE
 
