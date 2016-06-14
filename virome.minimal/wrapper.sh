@@ -1,5 +1,4 @@
-#! /bin/sh
-
+#!/bin/bash
 
 export PERL5LIB=/opt/package_virome/autopipe_package/ergatis/lib
 
@@ -51,6 +50,10 @@ export PERL5LIB=/opt/package_virome/autopipe_package/ergatis/lib
 #--------------------------------------------------------------------------------
 # Configure/run pipeline (virome)
 
+# TODO: This next step is probably asynchronousk, so it probably immediately exits
+# after the pipeline is executed. So, we need to invoke another script to 
+# block and wait for the pipeline to be complete before this script is allowed
+# to exit
 /opt/package_virome/autopipe_package/ergatis/util/virome_little_run_pipeline.pl \
 -t /opt/package_virome/project_saved_templates/little-pipeline/ \
 -r /opt/projects/virome/ \
@@ -58,4 +61,9 @@ export PERL5LIB=/opt/package_virome/autopipe_package/ergatis/lib
 -i /opt/projects/virome/workflow/project_id_repository/ \
 -f /opt/package_virome/play_data/GS115.fasta
 
-echo $?
+# TODO: Invoke the blocking/pipeline monitoring script. Exit with an exit
+# value that indicates overall pipeline success or failure.
+
+# TODO: Implement
+# /opt/scripts/monitor.pl
+exit $?
