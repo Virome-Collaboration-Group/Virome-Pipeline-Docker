@@ -17,29 +17,29 @@ ARG DEBIAN_FRONTEND=noninteractive
 #--------------------------------------------------------------------------------
 # SOFTWARE
 
-ENV BMSL_VERSION v2r18b1
-ENV BMSL_DOWNLOAD_URL http://sourceforge.net/projects/bsml/files/bsml/bsml-$BMSL_VERSION/bsml-$BMSL_VERSION.tar.gz
+ARG BMSL_VERSION=v2r18b1
+ARG BMSL_DOWNLOAD_URL=http://sourceforge.net/projects/bsml/files/bsml/bsml-$BMSL_VERSION/bsml-$BMSL_VERSION.tar.gz
 
-ENV ERGATIS_VERSION v2r19b4
-ENV ERGATIS_DOWNLOAD_URL https://github.com/jorvis/ergatis/archive/$ERGATIS_VERSION.tar.gz
+ARG ERGATIS_VERSION=v2r19b4
+ARG ERGATIS_DOWNLOAD_URL=https://github.com/jorvis/ergatis/archive/$ERGATIS_VERSION.tar.gz
 
-ENV WORKFLOW_VERSION 3.1.5
-ENV WORKFLOW_DOWNLOAD_URL http://sourceforge.net/projects/tigr-workflow/files/tigr-workflow/wf-$WORKFLOW_VERSION.tar.gz
+ARG WORKFLOW_VERSION=3.1.5
+ARG WORKFLOW_DOWNLOAD_URL=http://sourceforge.net/projects/tigr-workflow/files/tigr-workflow/wf-$WORKFLOW_VERSION.tar.gz
 
-ENV VIROME_VERSION 1.0
-ENV VIROME_DOWNLOAD_URL https://github.com/Virome-Collaboration-Group/virome_pipeline/archive/master.zip
+ARG VIROME_VERSION=1.0
+ARG VIROME_DOWNLOAD_URL=https://github.com/Virome-Collaboration-Group/virome_pipeline/archive/master.zip
 
-ENV CD_HIT_VERSION 4.6.4
-ENV CD_HIT_DOWNLOAD_URL https://github.com/weizhongli/cdhit/archive/V${CD_HIT_VERSION}.tar.gz
+ARG CD_HIT_VERSION=4.6.4
+ARG CD_HIT_DOWNLOAD_URL=https://github.com/weizhongli/cdhit/archive/V${CD_HIT_VERSION}.tar.gz
 
-ENV MGA_VERSION noversion
-ENV MGA_DOWNLOAD_URL http://metagene.nig.ac.jp/metagene/mga_x86_64.tar.gz
+ARG MGA_VERSION=noversion
+ARG MGA_DOWNLOAD_URL=http://metagene.nig.ac.jp/metagene/mga_x86_64.tar.gz
 
-ENV NCBI_BLAST_VERSION 2.3.0
-ENV NCBI_BLAST_DOWNLOAD_URL ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ncbi-blast-${NCBI_BLAST_VERSION}+-x64-linux.tar.gz
+ARG NCBI_BLAST_VERSION=2.3.0
+ARG NCBI_BLAST_DOWNLOAD_URL=ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ncbi-blast-${NCBI_BLAST_VERSION}+-x64-linux.tar.gz
 
-ENV TRNASCAN_SE_VERSION 1.3.1
-ENV TRNASCAN_SE_DOWNLOAD_URL http://lowelab.ucsc.edu/software/tRNAscan-SE-${TRNASCAN_SE_VERSION}.tar.gz
+ARG TRNASCAN_SE_VERSION=1.3.1
+ARG TRNASCAN_SE_DOWNLOAD_URL=http://lowelab.ucsc.edu/software/tRNAscan-SE-${TRNASCAN_SE_VERSION}.tar.gz
 
 #--------------------------------------------------------------------------------
 # BASICS
