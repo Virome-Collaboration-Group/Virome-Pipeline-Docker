@@ -51,15 +51,11 @@ export PERL5LIB=/opt/package_virome/autopipe_package/ergatis/lib
 #--------------------------------------------------------------------------------
 # Configure/run pipeline (virome)
 
-/opt/scripts/virome_454_fasta_unassembled_run_pipeline.pl \
-	--template_directory=/opt/package_virome/project_saved_templates/454-fasta-unassembled \
-	--repository_root=/opt/projects/virome \
-	--id_repository=/opt/projects/virome/workflow/project_id_repository \
-	--ergatis_ini=/opt/package_virome/autopipe_package/ergatis.ini \
-	--fasta=/tmp/file.fasta \
-	--prefix=test \
-	--library_id=2 \
-	--sequences=1 \
-	--database=diag1
+/opt/package_virome/autopipe_package/ergatis/util/virome_little_run_pipeline.pl \
+-t /opt/package_virome/project_saved_templates/little-pipeline/ \
+-r /opt/projects/virome/ \
+-e /opt/package_virome/autopipe_package/ergatis.ini \
+-i /opt/projects/virome/workflow/project_id_repository/ \
+-f /opt/package_virome/play_data/GS115.fasta
 
 echo $?
