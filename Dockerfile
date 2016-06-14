@@ -1,10 +1,6 @@
 ############################################################
 # Dockerfile to build container virome pipeline image
-# Based on Ubuntu
 ############################################################ 
-
-# Docker 1.9.1 currently hangs when attempting to build openjdk-6-jre.
-# Upgrade Docker by installing DockerToolbox-1.10.0-rc3.
 
 FROM ubuntu:trusty
 

@@ -1,6 +1,5 @@
 ############################################################
 # Dockerfile to build container virome pipeline image
-# Based on Ubuntu
 ############################################################ 
 
 FROM ubuntu:trusty
