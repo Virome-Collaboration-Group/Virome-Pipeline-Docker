@@ -62,14 +62,7 @@ RUN apt-get update && apt-get install -y \
 
 COPY lib/lib*.deb /tmp/
 
-RUN dpkg -i \
-	/tmp/libfile-mirror-perl_0.10-1_all.deb \
-	/tmp/liblog-cabin-perl_0.06-1_all.deb \
-	/tmp/libxml-twig-perl_3.39-1_all.deb \
-  && rm /tmp/libfile-mirror-perl_0.10-1_all.deb \
-	/tmp/liblog-cabin-perl_0.06-1_all.deb \
-	/tmp/libxml-twig-perl_3.39-1_all.deb
-
+RUN dpkg -i /tmp/*.deb && rm /tmp/*.deb
 
 #--------------------------------------------------------------------------------
 # WORKFLOW -- install in /opt/workflow
@@ -165,7 +158,7 @@ WORKDIR /opt/scripts
 COPY wrapper.sh /opt/scripts/wrapper.sh
 RUN chmod 755 /opt/scripts/wrapper.sh
 
-VOLUME /input /opt/database /opt/input /opt/output
+VOLUME /opt/database /opt/input /opt/output
 
 #--------------------------------------------------------------------------------
 # Default Command
