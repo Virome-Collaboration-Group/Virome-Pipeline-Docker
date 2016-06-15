@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 
 usage() {
@@ -28,7 +28,7 @@ do
 	--disable-data-download)
 		opt_d=0
 		;;
-		--)
+	--)
 		shift
 		break
 		;;
