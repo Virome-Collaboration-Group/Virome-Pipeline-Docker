@@ -48,6 +48,7 @@ RUN apt-get update && apt-get install -y \
 	apache2 \
 	openjdk-6-jre \
 	ncbi-blast+ \
+	sqlite3 \
 	zip \
 	zsync \
   && rm -rf /var/lib/apt/lists/*
