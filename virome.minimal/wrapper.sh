@@ -50,32 +50,32 @@ then
 fi
 
 #--------------------------------------------------------------------------------
-# Verify input/output/project directories
+# Verify input/output/database directories
 
-if [ ! -d /tmp/input ]
+if [ ! -d /opt/input ]
 then
-	echo "$0: directory not found: /tmp/input"
+	echo "$0: directory not found: /opt/input"
 	exit 1
 fi
 
-### if [ ! -d /tmp/output ]
-### then
-### 	echo "$0: directory not found: /tmp/output"
-### 	exit 1
-### fi
-### 
-### if [ ! -d /usr/local/projects ]
-### then
-### 	echo "$0: directory not found: /usr/local/projects"
-### 	exit 1
-### fi
+if [ ! -d /opt/output ]
+then
+	echo "$0: directory not found: /opt/output"
+	exit 1
+fi
+
+if [ ! -d /opt/database]
+then
+	echo "$0: directory not found: /opt/database"
+	exit 1
+fi
 
 #--------------------------------------------------------------------------------
 # Download data files
 
 if [ $opt_d -eq 1 ]
 then
-	cd /tmp/input
+	cd /opt/input
 	
 	DATA_FILES="\
 		MGOL_DEC2014 \
