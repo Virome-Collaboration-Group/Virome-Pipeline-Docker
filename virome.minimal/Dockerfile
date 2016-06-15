@@ -33,6 +33,7 @@ RUN apt-get update && apt-get install -y \
 	apache2 \
 	openjdk-6-jre \
 	ncbi-blast+ \
+	sqlite3 \
 	zip \
 	zsync \
   && rm -rf /var/lib/apt/lists/*
@@ -56,7 +57,6 @@ RUN apt-get update && apt-get install -y \
 	libperlio-gzip-perl \
 	libxml-parser-perl \
 	libxml-rss-perl \
-	libxml-twig-perl \
 	libxml-writer-perl \
   && rm -rf /var/lib/apt/lists/*
 
@@ -65,8 +65,11 @@ COPY lib/lib*.deb /tmp/
 RUN dpkg -i \
 	/tmp/libfile-mirror-perl_0.10-1_all.deb \
 	/tmp/liblog-cabin-perl_0.06-1_all.deb \
+	/tmp/libxml-twig-perl_3.39-1_all.deb \
   && rm /tmp/libfile-mirror-perl_0.10-1_all.deb \
-	/tmp/liblog-cabin-perl_0.06-1_all.deb
+	/tmp/liblog-cabin-perl_0.06-1_all.deb \
+	/tmp/libxml-twig-perl_3.39-1_all.deb
+
 
 #--------------------------------------------------------------------------------
 # WORKFLOW -- install in /opt/workflow
@@ -91,7 +94,6 @@ WORKDIR /opt/src/virome
 
 COPY ergatis.install.fix /tmp/.
 COPY virome.ergatis.ini /tmp/.
-COPY virome.software.config /tmp/.
 
 RUN curl -SL $VIROME_DOWNLOAD_URL -o virome.zip \
 	&& unzip -o virome.zip \
@@ -104,8 +106,7 @@ RUN curl -SL $VIROME_DOWNLOAD_URL -o virome.zip \
 	&& make \
 	&& make install \
 	&& cp /tmp/virome.ergatis.ini /opt/package_virome/autopipe_package/ergatis/htdocs/cgi/ergatis.ini \
-	&& cp /tmp/virome.ergatis.ini /opt/package_virome/autopipe_package/ergatis.ini \
-	&& cp /tmp/virome.software.config /opt/package_virome/software.config
+	&& cp /tmp/virome.ergatis.ini /opt/package_virome/autopipe_package/ergatis.ini
 
 RUN echo "virome = /opt/projects/virome" >> /opt/package_virome/autopipe_package/ergatis.ini
 
