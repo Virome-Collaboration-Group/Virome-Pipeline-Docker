@@ -13,26 +13,11 @@ ARG DEBIAN_FRONTEND=noninteractive
 #--------------------------------------------------------------------------------
 # SOFTWARE
 
-ARG BMSL_VERSION=v2r18b1
-ARG BMSL_DOWNLOAD_URL=http://sourceforge.net/projects/bsml/files/bsml/bsml-$BMSL_VERSION/bsml-$BMSL_VERSION.tar.gz
-
-ARG ERGATIS_VERSION=v2r19b4
-ARG ERGATIS_DOWNLOAD_URL=https://github.com/jorvis/ergatis/archive/$ERGATIS_VERSION.tar.gz
-
 ARG WORKFLOW_VERSION=3.1.5
-ARG WORKFLOW_DOWNLOAD_URL=http://sourceforge.net/projects/tigr-workflow/files/tigr-workflow/wf-$WORKFLOW_VERSION.tar.gz
+ARG WORKFLOW_DOWNLOAD_URL=http://sourceforge.net/projects/tigr-workflow/files/tigr-workflow/wf-${WORKFLOW_VERSION}.tar.gz
 
 ARG VIROME_VERSION=1.0
 ARG VIROME_DOWNLOAD_URL=https://github.com/Virome-Collaboration-Group/virome_pipeline/archive/master.zip
-
-ARG CD_HIT_VERSION=4.6.4
-ARG CD_HIT_DOWNLOAD_URL=https://github.com/weizhongli/cdhit/archive/V${CD_HIT_VERSION}.tar.gz
-
-ARG MGA_VERSION=noversion
-ARG MGA_DOWNLOAD_URL=http://metagene.nig.ac.jp/metagene/mga_x86_64.tar.gz
-
-ARG NCBI_BLAST_VERSION=2.3.0
-ARG NCBI_BLAST_DOWNLOAD_URL=ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/ncbi-blast-${NCBI_BLAST_VERSION}+-x64-linux.tar.gz
 
 ARG TRNASCAN_SE_VERSION=1.3.1
 ARG TRNASCAN_SE_DOWNLOAD_URL=http://lowelab.ucsc.edu/software/tRNAscan-SE-${TRNASCAN_SE_VERSION}.tar.gz
@@ -72,17 +57,12 @@ RUN apt-get update && apt-get install -y \
 	libperlio-gzip-perl \
 	libxml-parser-perl \
 	libxml-rss-perl \
-	libxml-twig-perl \
 	libxml-writer-perl \
   && rm -rf /var/lib/apt/lists/*
 
 COPY lib/lib*.deb /tmp/
 
-RUN dpkg -i \
-	/tmp/libfile-mirror-perl_0.10-1_all.deb \
-	/tmp/liblog-cabin-perl_0.06-1_all.deb \
-  && rm /tmp/libfile-mirror-perl_0.10-1_all.deb \
-	/tmp/liblog-cabin-perl_0.06-1_all.deb
+RUN dpkg -i /tmp/*.deb && rm /tmp/*.deb
 
 #--------------------------------------------------------------------------------
 # WORKFLOW -- install in /opt/workflow
@@ -107,7 +87,6 @@ WORKDIR /opt/src/virome
 
 COPY ergatis.install.fix /tmp/.
 COPY virome.ergatis.ini /tmp/.
-COPY virome.software.config /tmp/.
 
 RUN curl -SL $VIROME_DOWNLOAD_URL -o virome.zip \
 	&& unzip -o virome.zip \
@@ -120,8 +99,7 @@ RUN curl -SL $VIROME_DOWNLOAD_URL -o virome.zip \
 	&& make \
 	&& make install \
 	&& cp /tmp/virome.ergatis.ini /opt/package_virome/autopipe_package/ergatis/htdocs/cgi/ergatis.ini \
-	&& cp /tmp/virome.ergatis.ini /opt/package_virome/autopipe_package/ergatis.ini \
-	&& cp /tmp/virome.software.config /opt/package_virome/software.config
+	&& cp /tmp/virome.ergatis.ini /opt/package_virome/autopipe_package/ergatis.ini
 
 RUN echo "virome = /opt/projects/virome" >> /opt/package_virome/autopipe_package/ergatis.ini
 
@@ -177,15 +155,10 @@ ENV PERL5LIB=/opt/package_virome/autopipe_package/ergatis/lib
 RUN mkdir -p /opt/scripts
 WORKDIR /opt/scripts
 
-COPY virome_454_fasta_unassembled_run_pipeline.pl /opt/scripts/.
-RUN chmod 755 /opt/scripts/virome_454_fasta_unassembled_run_pipeline.pl
-
 COPY wrapper.sh /opt/scripts/wrapper.sh
 RUN chmod 755 /opt/scripts/wrapper.sh
 
-COPY file.fasta /tmp/.
-
-VOLUME /input /opt/database /opt/input /opt/output
+VOLUME /opt/database /opt/input /opt/output
 
 #--------------------------------------------------------------------------------
 # Default Command
