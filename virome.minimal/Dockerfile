@@ -164,6 +164,8 @@ WORKDIR /opt/scripts
 COPY wrapper.sh /opt/scripts/wrapper.sh
 RUN chmod 755 /opt/scripts/wrapper.sh
 
+VOLUME /input /opt/database /opt/input /opt/output
+
 #--------------------------------------------------------------------------------
 # Default Command
 
