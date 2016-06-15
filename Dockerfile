@@ -184,6 +184,8 @@ RUN chmod 755 /opt/scripts/wrapper.sh
 
 COPY file.fasta /tmp/.
 
+VOLUME /input /opt/database /opt/input /opt/output
+
 #--------------------------------------------------------------------------------
 # Default Command
 
