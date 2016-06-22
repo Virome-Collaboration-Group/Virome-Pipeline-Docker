@@ -6,6 +6,11 @@ FROM ubuntu:trusty
 
 MAINTAINER Tom Emmel <temmel@som.umaryland.edu>
 
+
+# Set default timezone
+ENV TZ=America/New_York
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 # Handle warnings from apt/dpkg
 ARG TERM=linux
 ARG DEBIAN_FRONTEND=noninteractive
