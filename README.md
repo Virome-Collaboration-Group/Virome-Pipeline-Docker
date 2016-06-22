@@ -84,7 +84,7 @@ Run wrapper.sh in the container overriding the default parameters:
 ##DOCKERFILE - TIMEZONE
 
 
-The timezone envronment variable TZ is set to the default America/New_York timezone:
+The timezone environment variable TZ is set to the default America/New_York timezone:
 
 ```
 ENV TZ=America/New_York
