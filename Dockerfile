@@ -167,11 +167,6 @@ RUN chmod 755 /opt/scripts/wrapper.sh
 VOLUME /opt/database /opt/input /opt/output
 
 #--------------------------------------------------------------------------------
-# Make BLAST DB
-
-RUN cd /opt/database && makeblastdb -in UNIREF50_2015_12 -dbtype prot && makeblastdb -in UNIREF100_2015_12 -dbtype prot -parse_seqids
-
-#--------------------------------------------------------------------------------
 # Default Command
 
 CMD [ "/opt/scripts/wrapper.sh" ]
