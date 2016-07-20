@@ -30,7 +30,8 @@ ARG TRNASCAN_SE_DOWNLOAD_URL=http://lowelab.ucsc.edu/software/tRNAscan-SE-${TRNA
 #--------------------------------------------------------------------------------
 # BASICS
 
-RUN apt-get update && apt-get install -y \
+#RUN echo "nameserver 8.8.8.8" >> /etc/resolv.conf && echo "nameserver 8.8.4.4" >> /etc/resolv.conf && cat /etc/resolv.conf && apt-get update && apt-get install -y \
+RUN ping -c 5 archive.ubuntu.com && apt-get update && apt-get install -y \
 	build-essential \
 	curl \
 	cpanminus \
@@ -164,6 +165,11 @@ COPY wrapper.sh /opt/scripts/wrapper.sh
 RUN chmod 755 /opt/scripts/wrapper.sh
 
 VOLUME /opt/database /opt/input /opt/output
+
+#--------------------------------------------------------------------------------
+# Make BLAST DB
+
+RUN cd /opt/database && makeblastdb -in UNIREF50_2015_12 -dbtype prot && makeblastdb -in UNIREF100_2015_12 -dbtype prot -parse_seqids
 
 #--------------------------------------------------------------------------------
 # Default Command
