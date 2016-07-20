@@ -1,15 +1,9 @@
 ############################################################
 # Dockerfile to build container virome pipeline image
 ############################################################ 
-
 FROM ubuntu:trusty
 
 MAINTAINER Tom Emmel <temmel@som.umaryland.edu>
-
-
-# Set default timezone
-ENV TZ=America/New_York
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # Handle warnings from apt/dpkg
 ARG TERM=linux
@@ -30,7 +24,6 @@ ARG TRNASCAN_SE_DOWNLOAD_URL=http://lowelab.ucsc.edu/software/tRNAscan-SE-${TRNA
 #--------------------------------------------------------------------------------
 # BASICS
 
-#RUN echo "nameserver 8.8.8.8" >> /etc/resolv.conf && echo "nameserver 8.8.4.4" >> /etc/resolv.conf && cat /etc/resolv.conf && apt-get update && apt-get install -y \
 RUN ping -c 5 archive.ubuntu.com && apt-get update && apt-get install -y \
 	build-essential \
 	curl \
@@ -78,7 +71,7 @@ WORKDIR /usr/src/workflow
 
 COPY workflow.deploy.answers /tmp/.
 
-RUN curl -SL $WORKFLOW_DOWNLOAD_URL -o workflow.tar.gz \
+RUN curl -s -SL $WORKFLOW_DOWNLOAD_URL -o workflow.tar.gz \
 	&& tar -xvf workflow.tar.gz -C /usr/src/workflow \
 	&& rm workflow.tar.gz \
 	&& mkdir -p /opt/workflow/server-conf \
@@ -94,20 +87,16 @@ WORKDIR /opt/src/virome
 COPY ergatis.install.fix /tmp/.
 COPY virome.ergatis.ini /tmp/.
 
-RUN curl -SL $VIROME_DOWNLOAD_URL -o virome.zip \
+RUN curl -s -SL $VIROME_DOWNLOAD_URL -o virome.zip \
 	&& unzip -o virome.zip \
 	&& rm virome.zip \
-	&& mv /opt/src/virome/virome_pipeline-master /opt/package_virome \
-	&& cd /opt/package_virome/autopipe_package/ergatis \
-	&& cp /tmp/ergatis.install.fix . \
-	&& ./ergatis.install.fix \
-	&& perl Makefile.PL INSTALL_BASE=/opt/package_virome \
-	&& make \
-	&& make install \
-	&& cp /tmp/virome.ergatis.ini /opt/package_virome/autopipe_package/ergatis/htdocs/cgi/ergatis.ini \
-	&& cp /tmp/virome.ergatis.ini /opt/package_virome/autopipe_package/ergatis.ini
+	&& mv /opt/src/virome/virome_pipeline-master /opt/package_virome
 
-RUN echo "virome = /opt/projects/virome" >> /opt/package_virome/autopipe_package/ergatis.ini
+#--------------------------------------------------------------------------------
+# Ergatis -- install in /opt/ergatis
+
+# Add a "virome" project to the ergatis configuration
+#RUN echo "virome = /opt/projects/virome" >> /opt/ergatis/ergatis.ini
 
 #--------------------------------------------------------------------------------
 # TRNASCAN-SE -- install in /opt/trnascan-se
@@ -115,7 +104,7 @@ RUN echo "virome = /opt/projects/virome" >> /opt/package_virome/autopipe_package
 RUN mkdir -p /usr/src/trnascan-se
 WORKDIR /usr/src/trnascan-se
 
-RUN curl -SL $TRNASCAN_SE_DOWNLOAD_URL -o trnascan-se.tar.gz \
+RUN curl -s -SL $TRNASCAN_SE_DOWNLOAD_URL -o trnascan-se.tar.gz \
 	&& tar --strip-components=1 -xvf trnascan-se.tar.gz -C /usr/src/trnascan-se \
 	&& rm trnascan-se.tar.gz \
 	&& sed -i -e 's/..HOME./\/opt\/trnascan-se/' Makefile \
@@ -165,11 +154,6 @@ COPY wrapper.sh /opt/scripts/wrapper.sh
 RUN chmod 755 /opt/scripts/wrapper.sh
 
 VOLUME /opt/database /opt/input /opt/output
-
-#--------------------------------------------------------------------------------
-# Make BLAST DB
-
-RUN cd /opt/database && makeblastdb -in UNIREF50_2015_12 -dbtype prot && makeblastdb -in UNIREF100_2015_12 -dbtype prot -parse_seqids
 
 #--------------------------------------------------------------------------------
 # Default Command
