@@ -21,7 +21,10 @@ ARG DEBIAN_FRONTEND=noninteractive
 ARG WORKFLOW_VERSION=3.1.5
 ARG WORKFLOW_DOWNLOAD_URL=http://sourceforge.net/projects/tigr-workflow/files/tigr-workflow/wf-${WORKFLOW_VERSION}.tar.gz
 
-ARG VIROME_VERSION=1.0
+ARG ERGATIS_VERSION=x
+ARG ERGATIS_DOWNLOAD_URL=https://github.com/jorvis/ergatis/archive/master.zip
+
+ARG VIROME_VERSION=
 ARG VIROME_DOWNLOAD_URL=https://github.com/Virome-Collaboration-Group/virome_pipeline/archive/master.zip
 
 ARG TRNASCAN_SE_VERSION=1.3.1
@@ -85,28 +88,38 @@ RUN curl -SL $WORKFLOW_DOWNLOAD_URL -o workflow.tar.gz \
 	&& ./deploy.sh < /tmp/workflow.deploy.answers
 
 #--------------------------------------------------------------------------------
+# ERGATIS -- install in /opt/ergatis
+
+RUN mkdir -p /usr/src/ergatis
+WORKDIR /usr/src/ergatis
+
+COPY ergatis.install.fix /tmp/.
+COPY ergatis.ini /tmp/.
+
+RUN curl -SL $ERGATIS_DOWNLOAD_URL -o ergatis.zip \
+	&& unzip -o ergatis.zip \
+	&& rm ergatis.zip \
+	&& mkdir /opt/ergatis \
+	&& cd /usr/src/ergatis/ergatis-master \
+	&& cp /tmp/ergatis.install.fix . \
+	&& ./ergatis.install.fix \
+	&& perl Makefile.PL INSTALL_BASE=/opt/ergatis \
+	&& make \
+	&& make install \
+	&& mv /usr/src/ergatis/ergatis-master/htdocs /var/www/html/ergatis \
+	&& cp /tmp/ergatis.ini /var/www/html/ergatis/cgi/.
+
+#--------------------------------------------------------------------------------
 # VIROME -- install in /opt/package_virome
 
 RUN mkdir -p /opt/src/virome
 WORKDIR /opt/src/virome
 
-COPY ergatis.install.fix /tmp/.
-COPY virome.ergatis.ini /tmp/.
-
 RUN curl -SL $VIROME_DOWNLOAD_URL -o virome.zip \
 	&& unzip -o virome.zip \
 	&& rm virome.zip \
 	&& mv /opt/src/virome/virome_pipeline-master /opt/package_virome \
-	&& cd /opt/package_virome/autopipe_package/ergatis \
-	&& cp /tmp/ergatis.install.fix . \
-	&& ./ergatis.install.fix \
-	&& perl Makefile.PL INSTALL_BASE=/opt/package_virome \
-	&& make \
-	&& make install \
-	&& cp /tmp/virome.ergatis.ini /opt/package_virome/autopipe_package/ergatis/htdocs/cgi/ergatis.ini \
-	&& cp /tmp/virome.ergatis.ini /opt/package_virome/autopipe_package/ergatis.ini
-
-RUN echo "virome = /opt/projects/virome" >> /opt/package_virome/autopipe_package/ergatis.ini
+	&& echo "virome = /opt/projects/virome" >> /var/www/html/ergatis/cgi/ergatis.ini
 
 #--------------------------------------------------------------------------------
 # TRNASCAN-SE -- install in /opt/trnascan-se
@@ -153,9 +166,28 @@ RUN mkdir -p /opt/projects/virome \
         && cp /tmp/project.config /opt/projects/virome/workflow/.
 
 #--------------------------------------------------------------------------------
+# APACHE
+
+ENV APACHE_RUN_USER www-data
+ENV APACHE_RUN_GROUP www-data
+
+ENV APACHE_LOG_DIR /var/log/apache2
+ENV APACHE_PID_FILE /var/run/apache2.pid
+ENV APACHE_RUN_DIR /var/run/apache2
+ENV APACHE_LOCK_DIR /var/lock/apache2
+
+ENV PERL5LIB /opt/ergatis/lib/perl5
+
+RUN a2enmod cgid
+
+COPY 000-default.conf /etc/apache2/sites-available/000-default.conf
+
+EXPOSE 80
+
+#--------------------------------------------------------------------------------
 # Scripts
 
-ENV PERL5LIB=/opt/package_virome/autopipe_package/ergatis/lib
+ENV PERL5LIB=/opt/ergatis/lib/perl5
 
 RUN mkdir -p /opt/scripts
 WORKDIR /opt/scripts
@@ -168,4 +200,9 @@ VOLUME /opt/database /opt/input /opt/output
 #--------------------------------------------------------------------------------
 # Default Command
 
-CMD [ "/opt/scripts/wrapper.sh" ]
+#CMD [ "/usr/bin/timeout", "30", "/opt/scripts/wrapper.sh" ]
+#CMD [ "/usr/sbin/apache2ctl", "-DFOREGROUND" ]
+
+#CMD [ "/opt/scripts/wrapper.sh" ]
+
+CMD [ "/opt/scripts/wrapper.sh", "--start-web-server", "--disable-data-download" ]
