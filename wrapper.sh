@@ -6,12 +6,14 @@ usage() {
 	echo "Usage: $0 [OPTIONS]"
 	echo "  --enable-data-download      perform data file download (default)"
 	echo "  --disable-data-download     do not perform data file download"
+	echo "  --start-web-server          start web server"
 	echo "  -h, --help                  display this help and exit"
 }
 
 #--------------------------------------------------------------------------------
 # Process parameters
 
+opt_a=0
 opt_d=1
 
 while true
@@ -21,6 +23,9 @@ do
 	-h|--help)
 		usage
 		exit
+		;;
+	--start-web-server)
+		opt_a=1
 		;;
 	--enable-data-download)
 		opt_d=1
@@ -34,6 +39,7 @@ do
 		;;
 	-?*)
 		echo "$0: invalid option: $1"
+		usage
 		exit 1
 		;;
 	*)
@@ -64,7 +70,7 @@ then
 	exit 1
 fi
 
-if [ ! -d /opt/database]
+if [ ! -d /opt/database ]
 then
 	echo "$0: directory not found: /opt/database"
 	exit 1
@@ -98,21 +104,31 @@ then
 fi
 
 #--------------------------------------------------------------------------------
+# Start apache
+
+if [ $opt_a -eq 1 ]
+then
+	/usr/sbin/apachectl start
+fi
+
+#--------------------------------------------------------------------------------
 # Configure/run pipeline (virome)
 
-export PERL5LIB=/opt/package_virome/autopipe_package/ergatis/lib
+export PERL5LIB=/opt/ergatis/lib/perl5
 
 # TODO: This next step is probably asynchronous, so it probably immediately exits
 # after the pipeline is executed. So, we need to invoke another script to
 # block and wait for the pipeline to be complete before this script is allowed
 # to exit
 
-/opt/package_virome/autopipe_package/ergatis/util/virome_little_run_pipeline.pl \
+/opt/package_virome/autopipe_package/virome_little_run_pipeline.pl \
 -t /opt/package_virome/project_saved_templates/little-pipeline/ \
--r /opt/projects/virome/ \
--e /opt/package_virome/autopipe_package/ergatis.ini \
+-r /opt/projects/virome \
+-e /var/www/html/ergatis/cgi/ergatis.ini \
 -i /opt/projects/virome/workflow/project_id_repository/ \
 -f /opt/package_virome/play_data/GS115.fasta
+
+echo $?
 
 # TODO: Invoke the blocking/pipeline monitoring script. Exit with an exit
 # value that indicates overall pipeline success or failure.
@@ -120,4 +136,17 @@ export PERL5LIB=/opt/package_virome/autopipe_package/ergatis/lib
 # TODO: Implement
 # /opt/scripts/monitor.pl
 
-echo $?
+#--------------------------------------------------------------------------------
+# Sleep
+
+echo "sleeping 60 seconds..."
+
+sleep 60
+
+#--------------------------------------------------------------------------------
+# Stop apache
+
+if [ $opt_a -eq 1 ]
+then
+	/usr/sbin/apachectl stop
+fi
