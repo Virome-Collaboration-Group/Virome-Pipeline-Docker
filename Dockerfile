@@ -1,15 +1,9 @@
 ############################################################
 # Dockerfile to build container virome pipeline image
 ############################################################ 
-
 FROM ubuntu:trusty
 
 MAINTAINER Tom Emmel <temmel@som.umaryland.edu>
-
-
-# Set default timezone
-ENV TZ=America/New_York
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # Handle warnings from apt/dpkg
 ARG TERM=linux
@@ -33,7 +27,7 @@ ARG TRNASCAN_SE_DOWNLOAD_URL=http://lowelab.ucsc.edu/software/tRNAscan-SE-${TRNA
 #--------------------------------------------------------------------------------
 # BASICS
 
-RUN apt-get update && apt-get install -y \
+RUN ping -c 5 archive.ubuntu.com && apt-get update && apt-get install -y \
 	build-essential \
 	curl \
 	cpanminus \
@@ -64,6 +58,7 @@ RUN apt-get update && apt-get install -y \
 	libmath-combinatorics-perl \
 	libperlio-gzip-perl \
 	libxml-parser-perl \
+	libxml-twig-perl \
 	libxml-rss-perl \
 	libxml-writer-perl \
   && rm -rf /var/lib/apt/lists/*
@@ -80,7 +75,7 @@ WORKDIR /usr/src/workflow
 
 COPY workflow.deploy.answers /tmp/.
 
-RUN curl -SL $WORKFLOW_DOWNLOAD_URL -o workflow.tar.gz \
+RUN curl -s -SL $WORKFLOW_DOWNLOAD_URL -o workflow.tar.gz \
 	&& tar -xvf workflow.tar.gz -C /usr/src/workflow \
 	&& rm workflow.tar.gz \
 	&& mkdir -p /opt/workflow/server-conf \
@@ -127,7 +122,7 @@ RUN curl -SL $VIROME_DOWNLOAD_URL -o virome.zip \
 RUN mkdir -p /usr/src/trnascan-se
 WORKDIR /usr/src/trnascan-se
 
-RUN curl -SL $TRNASCAN_SE_DOWNLOAD_URL -o trnascan-se.tar.gz \
+RUN curl -s -SL $TRNASCAN_SE_DOWNLOAD_URL -o trnascan-se.tar.gz \
 	&& tar --strip-components=1 -xvf trnascan-se.tar.gz -C /usr/src/trnascan-se \
 	&& rm trnascan-se.tar.gz \
 	&& sed -i -e 's/..HOME./\/opt\/trnascan-se/' Makefile \
@@ -203,6 +198,4 @@ VOLUME /opt/database /opt/input /opt/output
 #CMD [ "/usr/bin/timeout", "30", "/opt/scripts/wrapper.sh" ]
 #CMD [ "/usr/sbin/apache2ctl", "-DFOREGROUND" ]
 
-#CMD [ "/opt/scripts/wrapper.sh" ]
-
-CMD [ "/opt/scripts/wrapper.sh", "--start-web-server", "--disable-data-download" ]
+CMD [ "/opt/scripts/wrapper.sh" ]
