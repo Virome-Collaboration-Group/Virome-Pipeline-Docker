@@ -135,18 +135,3 @@ echo $?
 
 # TODO: Implement
 # /opt/scripts/monitor.pl
-
-#--------------------------------------------------------------------------------
-# Sleep
-
-echo "sleeping 60 seconds..."
-
-sleep 60
-
-#--------------------------------------------------------------------------------
-# Stop apache
-
-if [ $opt_a -eq 1 ]
-then
-	/usr/sbin/apachectl stop
-fi
