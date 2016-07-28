@@ -5,6 +5,10 @@ FROM ubuntu:trusty
 
 MAINTAINER Tom Emmel <temmel@som.umaryland.edu>
 
+# Set default timezone
+ENV TZ=America/New_York
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 # Handle warnings from apt/dpkg
 ARG TERM=linux
 ARG DEBIAN_FRONTEND=noninteractive
@@ -91,7 +95,7 @@ WORKDIR /usr/src/ergatis
 COPY ergatis.install.fix /tmp/.
 COPY ergatis.ini /tmp/.
 
-RUN curl -SL $ERGATIS_DOWNLOAD_URL -o ergatis.zip \
+RUN curl -s -SL $ERGATIS_DOWNLOAD_URL -o ergatis.zip \
 	&& unzip -o ergatis.zip \
 	&& rm ergatis.zip \
 	&& mkdir /opt/ergatis \
@@ -110,7 +114,7 @@ RUN curl -SL $ERGATIS_DOWNLOAD_URL -o ergatis.zip \
 RUN mkdir -p /opt/src/virome
 WORKDIR /opt/src/virome
 
-RUN curl -SL $VIROME_DOWNLOAD_URL -o virome.zip \
+RUN curl -s -SL $VIROME_DOWNLOAD_URL -o virome.zip \
 	&& unzip -o virome.zip \
 	&& rm virome.zip \
 	&& mv /opt/src/virome/virome_pipeline-master /opt/package_virome \
