@@ -31,7 +31,7 @@ ARG TRNASCAN_SE_DOWNLOAD_URL=http://lowelab.ucsc.edu/software/tRNAscan-SE-${TRNA
 #--------------------------------------------------------------------------------
 # BASICS
 
-RUN ping -c 5 archive.ubuntu.com && apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y \
 	build-essential \
 	curl \
 	cpanminus \
@@ -47,7 +47,7 @@ RUN ping -c 5 archive.ubuntu.com && apt-get update && apt-get install -y \
 #--------------------------------------------------------------------------------
 # PERL for ergatis
 
-RUN apt-get update && apt-get install -y \
+RUN apt-get install -y \
 	bioperl \
 	libcpan-meta-perl \
 	libcdb-file-perl \
