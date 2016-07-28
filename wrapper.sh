@@ -7,6 +7,7 @@ usage() {
 	echo "  --enable-data-download      perform data file download (default)"
 	echo "  --disable-data-download     do not perform data file download"
 	echo "  --start-web-server          start web server"
+	echo "  --threads=N                 thread count, where N is positive integer"
 	echo "  -h, --help                  display this help and exit"
 }
 
@@ -15,6 +16,7 @@ usage() {
 
 opt_a=0
 opt_d=1
+opt_t=0
 
 while true
 do
@@ -32,6 +34,15 @@ do
 		;;
 	--disable-data-download)
 		opt_d=0
+		;;
+	--threads=?*)
+		opt_t=1
+		threads=${1#*=}
+		;;
+	--threads|threads=)
+		echo "$0: missing argument to '$1' option"
+		usage
+		exit 1
 		;;
 	--)
 		shift
@@ -53,6 +64,24 @@ if [ $# != 0 ]
 then
 	usage
 	exit 1
+fi
+
+#--------------------------------------------------------------------------------
+# Verify threads
+
+if [ $opt_t = 1 ]
+then
+	if [[ $threads =~ ^-?[0-9]+$ ]]
+	then
+		if [ $threads -le 0 ]
+		then
+			echo "$0: invalid thread count: $threads"
+			exit 1
+		fi
+	else
+		echo "$0: invalid thread count: $threads"
+		exit 1
+	fi
 fi
 
 #--------------------------------------------------------------------------------
