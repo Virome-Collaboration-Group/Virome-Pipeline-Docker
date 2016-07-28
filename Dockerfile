@@ -1,6 +1,7 @@
 ############################################################
 # Dockerfile to build container virome pipeline image
 ############################################################ 
+
 FROM ubuntu:trusty
 
 MAINTAINER Tom Emmel <temmel@som.umaryland.edu>
@@ -19,7 +20,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 ARG WORKFLOW_VERSION=3.1.5
 ARG WORKFLOW_DOWNLOAD_URL=http://sourceforge.net/projects/tigr-workflow/files/tigr-workflow/wf-${WORKFLOW_VERSION}.tar.gz
 
-ARG ERGATIS_VERSION=x
+ARG ERGATIS_VERSION=
 ARG ERGATIS_DOWNLOAD_URL=https://github.com/jorvis/ergatis/archive/master.zip
 
 ARG VIROME_VERSION=
@@ -162,7 +163,7 @@ RUN mkdir -p /opt/projects/virome \
 	&& mkdir /opt/projects/virome/workflow/runtime \
 	&& mkdir /opt/projects/virome/workflow/runtime/pipeline \
 	&& touch /opt/projects/virome/workflow/project_id_repository/valid_id_repository \
-        && cp /tmp/project.config /opt/projects/virome/workflow/.
+	&& cp /tmp/project.config /opt/projects/virome/workflow/.
 
 #--------------------------------------------------------------------------------
 # APACHE
@@ -198,8 +199,5 @@ VOLUME /opt/database /opt/input /opt/output
 
 #--------------------------------------------------------------------------------
 # Default Command
-
-#CMD [ "/usr/bin/timeout", "30", "/opt/scripts/wrapper.sh" ]
-#CMD [ "/usr/sbin/apache2ctl", "-DFOREGROUND" ]
 
 CMD [ "/opt/scripts/wrapper.sh" ]
