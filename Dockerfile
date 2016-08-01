@@ -187,8 +187,6 @@ EXPOSE 80
 #--------------------------------------------------------------------------------
 # Scripts
 
-ENV PERL5LIB=/opt/ergatis/lib/perl5
-
 RUN mkdir -p /opt/scripts
 WORKDIR /opt/scripts
 
