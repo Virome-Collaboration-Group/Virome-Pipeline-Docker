@@ -61,10 +61,15 @@ docker run -ti --rm \
 
 ##WRAPPER SCRIPT
 
+```
 /opt/scripts/wrapper.sh [OPTIONS]
-
---enable-data-download		download data files (default)
---disable-data-download		do not download data files
+  --enable-data-download      download data files (default)
+  --disable-data-download     do not download data files
+  --start-web-server          start web server
+  --sleep=number              pause number seconds before exiting
+  --threads=number            set number of threads
+  -h, --help                  display this help and exit
+```
 
 
 Run wrapper.sh in the container using default parameters:
