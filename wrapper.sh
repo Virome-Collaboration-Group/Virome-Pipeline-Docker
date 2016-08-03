@@ -7,7 +7,8 @@ usage() {
 	echo "  --enable-data-download      perform data file download (default)"
 	echo "  --disable-data-download     do not perform data file download"
 	echo "  --start-web-server          start web server"
-	echo "  --threads=N                 thread count, where N is positive integer"
+	echo "  --sleep=number              sleep number seconds"
+	echo "  --threads=number            set number of threads"
 	echo "  -h, --help                  display this help and exit"
 }
 
@@ -16,6 +17,7 @@ usage() {
 
 opt_a=0
 opt_d=1
+opt_s=0
 opt_t=0
 
 while true
@@ -34,6 +36,15 @@ do
 		;;
 	--disable-data-download)
 		opt_d=0
+		;;
+	--sleep=?*)
+		opt_s=1
+		seconds=${1#*=}
+		;;
+	--sleep|sleep=)
+		echo "$0: missing argument to '$1' option"
+		usage
+		exit 1
 		;;
 	--threads=?*)
 		opt_t=1
@@ -67,19 +78,25 @@ then
 fi
 
 #--------------------------------------------------------------------------------
+# Verify sleep seconds
+
+if [ $opt_s = 1 ]
+then
+	if [[ ! $seconds =~ ^[0-9]+$ ]]
+	then
+		echo "$0: invalid sleep number: $seconds"
+		exit 1
+	fi
+fi
+
+#--------------------------------------------------------------------------------
 # Verify threads
 
 if [ $opt_t = 1 ]
 then
-	if [[ $threads =~ ^-?[0-9]+$ ]]
+	if [[ ! $threads =~ ^[0-9]+$ ]]
 	then
-		if [ $threads -le 0 ]
-		then
-			echo "$0: invalid thread count: $threads"
-			exit 1
-		fi
-	else
-		echo "$0: invalid thread count: $threads"
+		echo "$0: invalid thread number: $threads"
 		exit 1
 	fi
 fi
@@ -145,11 +162,6 @@ fi
 
 export PERL5LIB=/opt/ergatis/lib/perl5
 
-# TODO: This next step is probably asynchronous, so it probably immediately exits
-# after the pipeline is executed. So, we need to invoke another script to
-# block and wait for the pipeline to be complete before this script is allowed
-# to exit
-
 /opt/package_virome/autopipe_package/virome_little_run_pipeline.pl \
 -t /opt/package_virome/project_saved_templates/little-pipeline/ \
 -r /opt/projects/virome \
@@ -159,8 +171,23 @@ export PERL5LIB=/opt/ergatis/lib/perl5
 
 echo $?
 
+
+# TODO: This next step is probably asynchronous, so it probably immediately exits
+# after the pipeline is executed. So, we need to invoke another script to
+# block and wait for the pipeline to be complete before this script is allowed
+# to exit
+
 # TODO: Invoke the blocking/pipeline monitoring script. Exit with an exit
 # value that indicates overall pipeline success or failure.
 
 # TODO: Implement
 # /opt/scripts/monitor.pl
+
+#--------------------------------------------------------------------------------
+# Sleep
+
+if [ $opt_s -eq 1 ]
+then
+	echo "sleeping $seconds seconds before exiting..."
+	sleep $seconds
+fi
