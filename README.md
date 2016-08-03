@@ -63,7 +63,6 @@ docker run -ti --rm \
 
 ```
 /opt/scripts/wrapper.sh [OPTIONS]
-
   --enable-data-download      download data files (default)
   --disable-data-download     do not download data files
   --start-web-server          start web server
