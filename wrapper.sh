@@ -7,7 +7,7 @@ usage() {
 	echo "  --enable-data-download      perform data file download (default)"
 	echo "  --disable-data-download     do not perform data file download"
 	echo "  --start-web-server          start web server"
-	echo "  --sleep=number              sleep number seconds"
+	echo "  --sleep=number              pause number seconds before exiting"
 	echo "  --threads=number            set number of threads"
 	echo "  -h, --help                  display this help and exit"
 }
