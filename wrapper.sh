@@ -162,12 +162,12 @@ fi
 
 export PERL5LIB=/opt/ergatis/lib/perl5
 
-/opt/package_virome/autopipe_package/virome_little_run_pipeline.pl \
--t /opt/package_virome/project_saved_templates/little-pipeline/ \
+/opt/ergatis/autopipe_package/virome_little_run_pipeline.pl \
+-t /opt/ergatis/project_saved_templates/little-pipeline/ \
 -r /opt/projects/virome \
 -e /var/www/html/ergatis/cgi/ergatis.ini \
 -i /opt/projects/virome/workflow/project_id_repository/ \
--f /opt/package_virome/play_data/GS115.fasta
+-f /opt/ergatis/play_data/GS115.fasta
 
 echo $?
 
