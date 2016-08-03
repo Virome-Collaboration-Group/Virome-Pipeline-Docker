@@ -21,7 +21,7 @@ ARG WORKFLOW_VERSION=3.1.5
 ARG WORKFLOW_DOWNLOAD_URL=http://sourceforge.net/projects/tigr-workflow/files/tigr-workflow/wf-${WORKFLOW_VERSION}.tar.gz
 
 ARG ERGATIS_VERSION=
-ARG ERGATIS_DOWNLOAD_URL=https://github.com/jorvis/ergatis/archive/master.zip
+ARG ERGATIS_DOWNLOAD_URL=https://github.com/Virome-Collaboration-Group/ergatis/archive/master.zip
 
 ARG VIROME_VERSION=
 ARG VIROME_DOWNLOAD_URL=https://github.com/Virome-Collaboration-Group/virome_pipeline/archive/master.zip
@@ -48,7 +48,7 @@ RUN apt-get update && apt-get install -y \
 #--------------------------------------------------------------------------------
 # PERL for ergatis
 
-RUN apt-get install -y \
+RUN apt-get update && apt-get install -y \
 	bioperl \
 	libcpan-meta-perl \
 	libcdb-file-perl \
@@ -110,15 +110,19 @@ RUN curl -s -SL $ERGATIS_DOWNLOAD_URL -o ergatis.zip \
 	&& cp /tmp/ergatis.ini /var/www/html/ergatis/cgi/.
 
 #--------------------------------------------------------------------------------
-# VIROME -- install in /opt/package_virome
+# VIROME only-- install in /opt/ergatis
 
-RUN mkdir -p /opt/src/virome
-WORKDIR /opt/src/virome
+RUN mkdir -p /usr/src/virome
+WORKDIR /usr/src/virome
 
 RUN curl -s -SL $VIROME_DOWNLOAD_URL -o virome.zip \
 	&& unzip -o virome.zip \
 	&& rm virome.zip \
-	&& mv /opt/src/virome/virome_pipeline-master /opt/package_virome \
+	&& cd /usr/src/virome/virome_pipeline-master \
+	&& ./pre.install.fix \
+	&& perl Makefile.PL INSTALL_BASE=/opt/ergatis \
+	&& make \
+	&& make install \
 	&& echo "virome = /opt/projects/virome" >> /var/www/html/ergatis/cgi/ergatis.ini
 
 #--------------------------------------------------------------------------------
