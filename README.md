@@ -47,7 +47,7 @@ docker run -ti --rm \
 	-v /path/to/inputdir:/opt/input \
 	-v /path/to/outputdir:/opt/output \
 	-v /path/to/databasedir:/opt/database \
-	virome bash
+	virome
 ```
 
 Port:
@@ -60,7 +60,7 @@ docker run -ti --rm \
 	-v /path/to/outputdir:/opt/output \
 	-v /path/to/databasedir:/opt/database \
 	-p 80:80 \
-	virome bash
+	virome
 ```
 
 Timezone:
@@ -74,7 +74,7 @@ docker run -ti --rm \
 	-v /path/to/outputdir:/opt/output \
 	-v /path/to/databasedir:/opt/database \
 	-e TZ=America/Chicago \
-	virome bash
+	virome
 ```
 
 Entrypoint:
@@ -94,7 +94,7 @@ docker run -ti --rm \
 
 ##APPLICATION OPTIONS
 
-The options are available for the default application:
+These options are available for the default application:
 
 ```
   --enable-data-download      download data files (default)
@@ -103,4 +103,12 @@ The options are available for the default application:
   --sleep=number              pause number seconds before exiting
   --threads=number            set number of threads
   -h, --help                  display this help and exit
+```
+
+```
+docker run -ti --rm \
+	-v /path/to/inputdir:/opt/input \
+	-v /path/to/outputdir:/opt/output \
+	-v /path/to/databasedir:/opt/database \
+	virome [APPLICATION_OPTIONS]
 ```
