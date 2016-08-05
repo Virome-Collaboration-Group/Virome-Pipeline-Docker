@@ -204,4 +204,4 @@ VOLUME /opt/database /opt/input /opt/output
 #--------------------------------------------------------------------------------
 # Default Command
 
-CMD [ "/opt/scripts/wrapper.sh" ]
+ENTRYPOINT [ "/opt/scripts/wrapper.sh" ]
