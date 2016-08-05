@@ -26,7 +26,8 @@ Run the container using the default application:
 docker run -ti --rm [DOCKER_OPTIONS] virome [APPLICATION_OPTIONS]
 ```
 
-Run the container overriding the default application using the "--entrypoint command" option:
+Run the container overriding the default application using the "--entrypoint"
+option:
 
 ```
 docker run -ti --rm --entrypoint /bin/bash [DOCKER_OPTIONS] virome [APPLICATION_OPTIONS]
@@ -76,9 +77,10 @@ docker run -ti --rm \
 	virome bash
 ```
 
-Shell:
+Entrypoint:
 
-To override the default application, use the "--entrypoint" option.
+Use the "--entrypoint" option to override the default application.  To obtain a
+shell, run:
 
 ```
 docker run -ti --rm \
@@ -92,6 +94,7 @@ docker run -ti --rm \
 
 ##APPLICATION OPTIONS
 
+The options are available for the default application:
 
 ```
   --enable-data-download      download data files (default)
