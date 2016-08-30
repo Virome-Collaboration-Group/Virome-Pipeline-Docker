@@ -6,11 +6,12 @@ Docker container for the Virome pipeline
 
 Build container:
 ```
-docker build -t name .
+docker build -t virome .
 ```
 
 
 ##DOCKER RUN
+
 
 
 Default application:
@@ -22,32 +23,50 @@ Default application:
 Run the container using the default application:
 
 ```
-docker run -ti --rm name
+docker run -ti --rm [DOCKER_OPTIONS] virome [APPLICATION_OPTIONS]
 ```
 
-Run the container using bash, overriding the default application:
+Run the container overriding the default application using the "--entrypoint"
+option:
 
 ```
-docker run -ti --rm name bash
+docker run -ti --rm --entrypoint /bin/bash [DOCKER_OPTIONS] virome [APPLICATION_OPTIONS]
 ```
 
-Required volumes:
 
-On the command line use the "-v" option to share local host directories to the
-container.  The required volume are /opt/input, /opt/output, /opt/database.
+##DOCKER OPTIONS
+
+
+Volumes:
+
+Use the "-v" option to share local host directories to the container.  The
+required volumes are /opt/input, /opt/output, /opt/database.
 
 ```
 docker run -ti --rm \
 	-v /path/to/inputdir:/opt/input \
 	-v /path/to/outputdir:/opt/output \
 	-v /path/to/databasedir:/opt/database \
-	name bash
+	virome
+```
+
+Port:
+
+Use the "-p" option to publish the web server port.
+
+```
+docker run -ti --rm \
+	-v /path/to/inputdir:/opt/input \
+	-v /path/to/outputdir:/opt/output \
+	-v /path/to/databasedir:/opt/database \
+	-p 80:80 \
+	virome
 ```
 
 Timezone:
 
-Set the TZ environment variable to the desired timezone on the command line using the
-"-e" option.  The default is TZ=America/New_York.
+Use the "-e" option to set the TZ environment variable to the desired timezone.
+The default is TZ=America/New_York.
 
 ```
 docker run -ti --rm \
@@ -55,14 +74,29 @@ docker run -ti --rm \
 	-v /path/to/outputdir:/opt/output \
 	-v /path/to/databasedir:/opt/database \
 	-e TZ=America/Chicago \
-	name bash
+	virome
+```
+
+Entrypoint:
+
+Use the "--entrypoint" option to override the default application.  To obtain a
+shell, run:
+
+```
+docker run -ti --rm \
+	-v /path/to/inputdir:/opt/input \
+	-v /path/to/outputdir:/opt/output \
+	-v /path/to/databasedir:/opt/database \
+	--entrypoint /bin/bash \
+	virome
 ```
 
 
-##WRAPPER SCRIPT
+##APPLICATION OPTIONS
+
+These options are available for the default application:
 
 ```
-/opt/scripts/wrapper.sh [OPTIONS]
   --enable-data-download      download data files (default)
   --disable-data-download     do not download data files
   --start-web-server          start web server
@@ -71,51 +105,10 @@ docker run -ti --rm \
   -h, --help                  display this help and exit
 ```
 
-
-Run wrapper.sh in the container using default parameters:
-
 ```
-% ./wrapper.sh
-```
-
-
-Run wrapper.sh in the container overriding the default parameters:
-
-```
-% ./wrapper.sh [OPTION]
-```
-
-
-##DOCKERFILE - TIMEZONE
-
-
-The timezone environment variable TZ is set to the default America/New_York timezone:
-
-```
-ENV TZ=America/New_York
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-```
-
-
-Current datetime:
-
-```
-$ date
-Fri Jun 17 15:47:13 EDT 2016
-```
-
-
-Run the container using the default timezone:
-
-```
-$ docker run -ti --rm name date
-Fri Jun 17 15:47:18 EDT 2016
-```
-
-
-Run the container overriding the default timezone using the "-e" option:
-
-```
-$ docker run -ti --rm -e TZ=America/Chicago name date
-Fri Jun 17 14:47:22 CDT 2016
+docker run -ti --rm \
+	-v /path/to/inputdir:/opt/input \
+	-v /path/to/outputdir:/opt/output \
+	-v /path/to/databasedir:/opt/database \
+	virome [APPLICATION_OPTIONS]
 ```
