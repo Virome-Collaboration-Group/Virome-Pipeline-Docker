@@ -7,6 +7,7 @@ usage() {
 	echo "  --enable-data-download      perform data file download (default)"
 	echo "  --disable-data-download     do not perform data file download"
 	echo "  --start-web-server          start web server"
+	echo "  --keepalive                 keep alive"
 	echo "  --sleep=number              pause number seconds before exiting"
 	echo "  --threads=number            set number of threads"
 	echo "  -h, --help                  display this help and exit"
@@ -17,6 +18,7 @@ usage() {
 
 opt_a=0
 opt_d=1
+opt_k=0
 opt_s=0
 opt_t=0
 
@@ -28,14 +30,17 @@ do
 		usage
 		exit
 		;;
-	--start-web-server)
-		opt_a=1
-		;;
 	--enable-data-download)
 		opt_d=1
 		;;
 	--disable-data-download)
 		opt_d=0
+		;;
+	--start-web-server)
+		opt_a=1
+		;;
+	--keepalive)
+		opt_k=1
 		;;
 	--sleep=?*)
 		opt_s=1
@@ -190,4 +195,15 @@ if [ $opt_s -eq 1 ]
 then
 	echo "sleeping $seconds seconds before exiting..."
 	sleep $seconds
+fi
+#--------------------------------------------------------------------------------
+# Keepalive
+
+if [ $opt_k -eq 1 ]
+then
+	echo "keepalive..."
+	while :
+	do
+		sleep 60
+	done
 fi
