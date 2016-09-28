@@ -7,7 +7,7 @@ usage() {
 	echo "  --enable-data-download      perform data file download (default)"
 	echo "  --disable-data-download     do not perform data file download"
 	echo "  --start-web-server          start web server"
-	echo "  --keepalive                 keep alive"
+	echo "  -k,--keep-alive             keep alive"
 	echo "  --sleep=number              pause number seconds before exiting"
 	echo "  --threads=number            set number of threads"
 	echo "  -h, --help                  display this help and exit"
@@ -39,7 +39,7 @@ do
 	--start-web-server)
 		opt_a=1
 		;;
-	--keepalive)
+	-k|--keep-alive)
 		opt_k=1
 		;;
 	--sleep=?*)
@@ -189,6 +189,15 @@ echo $?
 # /opt/scripts/monitor.pl
 
 #--------------------------------------------------------------------------------
+# Verify sleep and keep-alive options - mutually exclusive
+
+if [ $opt_s -eq 1 -a $opt_k -eq 1 ]
+then
+	echo "$0: specifying both sleep and keep-alive options not allowed"
+	exit 1
+fi
+
+#--------------------------------------------------------------------------------
 # Sleep
 
 if [ $opt_s -eq 1 ]
@@ -201,7 +210,7 @@ fi
 
 if [ $opt_k -eq 1 ]
 then
-	echo "keepalive..."
+	echo "keep alive..."
 	while :
 	do
 		sleep 60
