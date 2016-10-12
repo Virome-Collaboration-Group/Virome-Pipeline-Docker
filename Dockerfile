@@ -87,6 +87,8 @@ RUN curl -s -SL $WORKFLOW_DOWNLOAD_URL -o workflow.tar.gz \
 	&& chmod 777 /opt/workflow/server-conf \
 	&& ./deploy.sh < /tmp/workflow.deploy.answers
 
+COPY workflow.log4j.properties /opt/workflow/log4j.properties
+
 #--------------------------------------------------------------------------------
 # ERGATIS -- install in /opt/ergatis
 
