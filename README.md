@@ -30,7 +30,7 @@ Run the container overriding the default application using the "--entrypoint"
 option:
 
 ```
-docker run -ti --rm --entrypoint /bin/bash [DOCKER_OPTIONS] virome [APPLICATION_OPTIONS]
+docker run -ti --rm --entrypoint /bin/bash [DOCKER_OPTIONS] virome
 ```
 
 
