@@ -85,7 +85,7 @@ fi
 #--------------------------------------------------------------------------------
 # Verify sleep seconds
 
-if [ $opt_s = 1 ]
+if [ $opt_s -eq 1 ]
 then
 	if [[ ! $seconds =~ ^[0-9]+$ ]]
 	then
@@ -97,7 +97,7 @@ fi
 #--------------------------------------------------------------------------------
 # Verify threads
 
-if [ $opt_t = 1 ]
+if [ $opt_t -eq 1 ]
 then
 	if [[ ! $threads =~ ^[0-9]+$ ]]
 	then
@@ -163,7 +163,7 @@ then
 fi
 
 #--------------------------------------------------------------------------------
-# Configure/run pipeline (virome)
+# Configure/run virome pipeline
 
 export PERL5LIB=/opt/ergatis/lib/perl5
 
@@ -174,19 +174,19 @@ export PERL5LIB=/opt/ergatis/lib/perl5
 -i /opt/projects/virome/workflow/project_id_repository/ \
 -f /opt/ergatis/play_data/GS115.fasta
 
-echo $?
+# This following status setting is temporary.  We will ultimately use workflow
+# status or file to indicate actual success or failure of the pipeline.
 
+status=$?
+echo $status
 
-# TODO: This next step is probably asynchronous, so it probably immediately exits
-# after the pipeline is executed. So, we need to invoke another script to
-# block and wait for the pipeline to be complete before this script is allowed
-# to exit
+if [ $status -ne 0 ]
+then
+	echo "$0: workflow error: $status"
+        echo "$0: see pipeline.xml.log file in local output directory"
 
-# TODO: Invoke the blocking/pipeline monitoring script. Exit with an exit
-# value that indicates overall pipeline success or failure.
-
-# TODO: Implement
-# /opt/scripts/monitor.pl
+	cp /opt/projects/virome/workflow/runtime/pipeline/*/pipeline.xml.log /opt/output/.
+fi
 
 #--------------------------------------------------------------------------------
 # Verify sleep and keep-alive options - mutually exclusive
@@ -205,13 +205,14 @@ then
 	echo "sleeping $seconds seconds before exiting..."
 	sleep $seconds
 fi
+
 #--------------------------------------------------------------------------------
 # Keepalive
 
 if [ $opt_k -eq 1 ]
 then
 	echo "keep alive..."
-	while :
+	while true
 	do
 		sleep 60
 	done
