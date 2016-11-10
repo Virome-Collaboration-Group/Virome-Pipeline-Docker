@@ -174,9 +174,6 @@ export PERL5LIB=/opt/ergatis/lib/perl5
 -i /opt/projects/virome/workflow/project_id_repository/ \
 -f /opt/ergatis/play_data/GS115.fasta
 
-# This following status setting is temporary.  We will ultimately use workflow
-# status or file to indicate actual success or failure of the pipeline.
-
 status=$?
 echo $status
 
