@@ -113,3 +113,6 @@ docker run -ti --rm \
 	-v /path/to/databasedir:/opt/database \
 	virome [APPLICATION_OPTIONS]
 ```
+
+
+##ERROR HANDLING
