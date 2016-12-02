@@ -62,6 +62,7 @@ RUN apt-get update && apt-get install -y \
 	liblog-log4perl-perl \
 	libmath-combinatorics-perl \
 	libperlio-gzip-perl \
+	libterm-progressbar-perl \
 	libxml-parser-perl \
 	libxml-twig-perl \
 	libxml-rss-perl \
@@ -182,8 +183,6 @@ ENV APACHE_LOG_DIR /var/log/apache2
 ENV APACHE_PID_FILE /var/run/apache2.pid
 ENV APACHE_RUN_DIR /var/run/apache2
 ENV APACHE_LOCK_DIR /var/lock/apache2
-
-ENV PERL5LIB /opt/ergatis/lib/perl5
 
 RUN a2enmod cgid
 
