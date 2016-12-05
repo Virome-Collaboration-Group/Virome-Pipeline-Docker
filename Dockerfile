@@ -67,7 +67,6 @@ RUN apt-get update && apt-get install -y \
 	libxml-twig-perl \
 	libxml-rss-perl \
 	libxml-writer-perl \
-  && cpanm Tree::Nary \
   && rm -rf /var/lib/apt/lists/*
 
 COPY lib/lib*.deb /tmp/
