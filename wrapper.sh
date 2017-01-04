@@ -6,6 +6,7 @@ usage() {
 	echo "Usage: $0 [OPTIONS]"
 	echo "  --enable-data-download      perform data file download (default)"
 	echo "  --disable-data-download     do not perform data file download"
+	echo "  --input-file				input file to process"
 	echo "  --start-web-server          start web server"
 	echo "  -k,--keep-alive             keep alive"
 	echo "  --sleep=number              pause number seconds before exiting"
@@ -21,6 +22,7 @@ opt_d=1
 opt_k=0
 opt_s=0
 opt_t=0
+input_file="/opt/input/play_data.fasta"
 
 while true
 do
@@ -35,6 +37,14 @@ do
 		;;
 	--disable-data-download)
 		opt_d=0
+		;;
+	--input-file)
+		input_file=${1#*=}
+		;;
+	--input-file|input-file=)
+		echo "$0: missing argument to '$1' option"
+		usage
+		exit 1
 		;;
 	--start-web-server)
 		opt_a=1
@@ -133,7 +143,7 @@ fi
 if [ $opt_d -eq 1 ]
 then
 	cd /opt/input
-	
+
 	DATA_FILES="\
 		MGOL_DEC2014 \
 		MGOL_DEC2014.60 \
@@ -143,7 +153,7 @@ then
 		rRNA \
 		mgol60__2__mgol100.lookup \
 		uniref50__2__uniref100.lookup"
-	
+
 	for file in $DATA_FILES
 	do
 		echo "start: `date`: $file"
@@ -172,7 +182,7 @@ export PERL5LIB=/opt/ergatis/lib/perl5
 -r /opt/projects/virome \
 -e /var/www/html/ergatis/cgi/ergatis.ini \
 -i /opt/projects/virome/workflow/project_id_repository/ \
--f /opt/ergatis/play_data/GS115.fasta
+-f $input_file
 
 status=$?
 echo $status
