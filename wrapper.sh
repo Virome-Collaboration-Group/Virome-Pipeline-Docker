@@ -23,6 +23,7 @@ opt_k=0
 opt_s=0
 opt_t=0
 input_file="/opt/input/play_data.fasta"
+max_threads=1
 
 while true
 do
@@ -38,7 +39,7 @@ do
 	--disable-data-download)
 		opt_d=0
 		;;
-	--input-file)
+	--input-file=?*)
 		input_file=${1#*=}
 		;;
 	--input-file|input-file=)
@@ -114,6 +115,8 @@ then
 		echo "$0: invalid thread number: $threads"
 		exit 1
 	fi
+
+	my_threads=${threads}
 fi
 
 #--------------------------------------------------------------------------------
@@ -182,7 +185,8 @@ export PERL5LIB=/opt/ergatis/lib/perl5
 -r /opt/projects/virome \
 -e /var/www/html/ergatis/cgi/ergatis.ini \
 -i /opt/projects/virome/workflow/project_id_repository/ \
--f $input_file
+-f $input_file \
+-d $max_threads
 
 status=$?
 echo $status
