@@ -1,6 +1,6 @@
 ############################################################
 # Dockerfile to build container virome pipeline image
-############################################################ 
+############################################################
 
 FROM ubuntu:trusty
 
@@ -201,6 +201,9 @@ COPY wrapper.sh /opt/scripts/wrapper.sh
 RUN chmod 755 /opt/scripts/wrapper.sh
 
 VOLUME /opt/database /opt/input /opt/output
+
+#### copy blastp version to /usr/bin/.
+RUN cp /opt/ergatis/software/ncbi-blast-2.5.0+/bin/* /usr/bin/.
 
 #--------------------------------------------------------------------------------
 # Default Command
