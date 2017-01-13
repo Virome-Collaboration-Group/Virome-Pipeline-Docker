@@ -6,7 +6,7 @@ usage() {
 	echo "Usage: $0 [OPTIONS]"
 	echo "  --enable-data-download      perform data file download (default)"
 	echo "  --disable-data-download     do not perform data file download"
-	echo "  --input-file				input file to process"
+	echo "  --input-file                input file to process"
 	echo "  --start-web-server          start web server"
 	echo "  -k,--keep-alive             keep alive"
 	echo "  --sleep=number              pause number seconds before exiting"
