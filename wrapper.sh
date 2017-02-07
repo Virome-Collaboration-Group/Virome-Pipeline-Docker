@@ -6,7 +6,9 @@ usage() {
 	echo "Usage: $0 [OPTIONS]"
 	echo "  --enable-data-download      perform data file download (default)"
 	echo "  --disable-data-download     do not perform data file download"
+	echo "  --input-file                input file to process"
 	echo "  --start-web-server          start web server"
+	echo "  -k,--keep-alive             keep alive"
 	echo "  --sleep=number              pause number seconds before exiting"
 	echo "  --threads=number            set number of threads"
 	echo "  -h, --help                  display this help and exit"
@@ -17,8 +19,11 @@ usage() {
 
 opt_a=0
 opt_d=1
+opt_k=0
 opt_s=0
 opt_t=0
+input_file="/opt/input/play_data.fasta"
+max_threads=1
 
 while true
 do
@@ -28,14 +33,25 @@ do
 		usage
 		exit
 		;;
-	--start-web-server)
-		opt_a=1
-		;;
 	--enable-data-download)
 		opt_d=1
 		;;
 	--disable-data-download)
 		opt_d=0
+		;;
+	--input-file=?*)
+		input_file=${1#*=}
+		;;
+	--input-file|input-file=)
+		echo "$0: missing argument to '$1' option"
+		usage
+		exit 1
+		;;
+	--start-web-server)
+		opt_a=1
+		;;
+	-k|--keep-alive)
+		opt_k=1
 		;;
 	--sleep=?*)
 		opt_s=1
@@ -80,7 +96,7 @@ fi
 #--------------------------------------------------------------------------------
 # Verify sleep seconds
 
-if [ $opt_s = 1 ]
+if [ $opt_s -eq 1 ]
 then
 	if [[ ! $seconds =~ ^[0-9]+$ ]]
 	then
@@ -92,13 +108,15 @@ fi
 #--------------------------------------------------------------------------------
 # Verify threads
 
-if [ $opt_t = 1 ]
+if [ $opt_t -eq 1 ]
 then
 	if [[ ! $threads =~ ^[0-9]+$ ]]
 	then
 		echo "$0: invalid thread number: $threads"
 		exit 1
 	fi
+
+	max_threads=${threads}
 fi
 
 #--------------------------------------------------------------------------------
@@ -128,7 +146,7 @@ fi
 if [ $opt_d -eq 1 ]
 then
 	cd /opt/input
-	
+
 	DATA_FILES="\
 		MGOL_DEC2014 \
 		MGOL_DEC2014.60 \
@@ -138,7 +156,7 @@ then
 		rRNA \
 		mgol60__2__mgol100.lookup \
 		uniref50__2__uniref100.lookup"
-	
+
 	for file in $DATA_FILES
 	do
 		echo "start: `date`: $file"
@@ -158,7 +176,7 @@ then
 fi
 
 #--------------------------------------------------------------------------------
-# Configure/run pipeline (virome)
+# Configure/run virome pipeline
 
 export PERL5LIB=/opt/ergatis/lib/perl5
 
@@ -167,21 +185,28 @@ export PERL5LIB=/opt/ergatis/lib/perl5
 -r /opt/projects/virome \
 -e /var/www/html/ergatis/cgi/ergatis.ini \
 -i /opt/projects/virome/workflow/project_id_repository/ \
--f /opt/ergatis/play_data/GS115.fasta
+-f $input_file \
+-d $max_threads
 
-echo $?
+status=$?
+echo $status
 
+if [ $status -ne 0 ]
+then
+	echo "$0: workflow error: $status"
+        echo "$0: see pipeline.xml.log file in local output directory"
 
-# TODO: This next step is probably asynchronous, so it probably immediately exits
-# after the pipeline is executed. So, we need to invoke another script to
-# block and wait for the pipeline to be complete before this script is allowed
-# to exit
+	cp /opt/projects/virome/workflow/runtime/pipeline/*/pipeline.xml.log /opt/output/.
+fi
 
-# TODO: Invoke the blocking/pipeline monitoring script. Exit with an exit
-# value that indicates overall pipeline success or failure.
+#--------------------------------------------------------------------------------
+# Verify sleep and keep-alive options - mutually exclusive
 
-# TODO: Implement
-# /opt/scripts/monitor.pl
+if [ $opt_s -eq 1 -a $opt_k -eq 1 ]
+then
+	echo "$0: specifying both sleep and keep-alive options not allowed"
+	exit 1
+fi
 
 #--------------------------------------------------------------------------------
 # Sleep
@@ -190,4 +215,16 @@ if [ $opt_s -eq 1 ]
 then
 	echo "sleeping $seconds seconds before exiting..."
 	sleep $seconds
+fi
+
+#--------------------------------------------------------------------------------
+# Keepalive
+
+if [ $opt_k -eq 1 ]
+then
+	echo "keep alive..."
+	while true
+	do
+		sleep 60
+	done
 fi

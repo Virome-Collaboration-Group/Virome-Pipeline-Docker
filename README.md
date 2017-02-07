@@ -30,7 +30,7 @@ Run the container overriding the default application using the "--entrypoint"
 option:
 
 ```
-docker run -ti --rm --entrypoint /bin/bash [DOCKER_OPTIONS] virome [APPLICATION_OPTIONS]
+docker run -ti --rm --entrypoint /bin/bash [DOCKER_OPTIONS] virome
 ```
 
 
@@ -100,6 +100,7 @@ These options are available for the default application:
   --enable-data-download      download data files (default)
   --disable-data-download     do not download data files
   --start-web-server          start web server
+  -k, --keep-alive            keep alive
   --sleep=number              pause number seconds before exiting
   --threads=number            set number of threads
   -h, --help                  display this help and exit
@@ -112,3 +113,7 @@ docker run -ti --rm \
 	-v /path/to/databasedir:/opt/database \
 	virome [APPLICATION_OPTIONS]
 ```
+
+
+##ERROR HANDLING
+

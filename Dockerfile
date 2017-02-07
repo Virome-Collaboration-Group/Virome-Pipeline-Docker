@@ -1,6 +1,6 @@
 ############################################################
 # Dockerfile to build container virome pipeline image
-############################################################ 
+############################################################
 
 FROM ubuntu:trusty
 
@@ -62,6 +62,7 @@ RUN apt-get update && apt-get install -y \
 	liblog-log4perl-perl \
 	libmath-combinatorics-perl \
 	libperlio-gzip-perl \
+	libterm-progressbar-perl \
 	libxml-parser-perl \
 	libxml-twig-perl \
 	libxml-rss-perl \
@@ -86,6 +87,8 @@ RUN curl -s -SL $WORKFLOW_DOWNLOAD_URL -o workflow.tar.gz \
 	&& mkdir -p /opt/workflow/server-conf \
 	&& chmod 777 /opt/workflow/server-conf \
 	&& ./deploy.sh < /tmp/workflow.deploy.answers
+
+COPY workflow.log4j.properties /opt/workflow/log4j.properties
 
 #--------------------------------------------------------------------------------
 # ERGATIS -- install in /opt/ergatis
@@ -180,8 +183,6 @@ ENV APACHE_PID_FILE /var/run/apache2.pid
 ENV APACHE_RUN_DIR /var/run/apache2
 ENV APACHE_LOCK_DIR /var/lock/apache2
 
-ENV PERL5LIB /opt/ergatis/lib/perl5
-
 RUN a2enmod cgid
 
 COPY 000-default.conf /etc/apache2/sites-available/000-default.conf
@@ -198,6 +199,9 @@ COPY wrapper.sh /opt/scripts/wrapper.sh
 RUN chmod 755 /opt/scripts/wrapper.sh
 
 VOLUME /opt/database /opt/input /opt/output
+
+#### copy blastp version to /usr/bin/.
+RUN cp /opt/ergatis/software/ncbi-blast-2.5.0+/bin/* /usr/bin/.
 
 #--------------------------------------------------------------------------------
 # Default Command
