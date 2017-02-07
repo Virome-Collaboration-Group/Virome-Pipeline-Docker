@@ -183,9 +183,9 @@ ENV APACHE_PID_FILE /var/run/apache2.pid
 ENV APACHE_RUN_DIR /var/run/apache2
 ENV APACHE_LOCK_DIR /var/lock/apache2
 
-RUN a2enmod cgid
+COPY ergatis.conf /etc/apache2/conf-available/
 
-COPY 000-default.conf /etc/apache2/sites-available/000-default.conf
+RUN a2enmod cgid && a2enconf ergatis
 
 EXPOSE 80
 
@@ -200,7 +200,7 @@ RUN chmod 755 /opt/scripts/wrapper.sh
 
 VOLUME /opt/database /opt/input /opt/output
 
-#### copy blastp version to /usr/bin/.
+# Copy blastp version to /usr/bin/.
 RUN cp /opt/ergatis/software/ncbi-blast-2.5.0+/bin/* /usr/bin/.
 
 #--------------------------------------------------------------------------------
