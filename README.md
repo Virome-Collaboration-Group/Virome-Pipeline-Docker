@@ -4,7 +4,8 @@ Docker container for the Virome pipeline
 ##DOCKER BUILD
 
 
-Build container:
+Build the container:
+
 ```
 docker build -t virome .
 ```
@@ -12,30 +13,20 @@ docker build -t virome .
 
 ##DOCKER RUN
 
-
-
-Default application:
+Run the container:
 
 ```
-/opt/scripts/wrapper.sh
+docker run -ti --rm [DOCKER OPTIONS] virome [VIROME OPTIONS]
 ```
 
-Run the container using the default application:
+To gain a shell inside the container, override the default entrypoint using the "--entrypoint"
+docker option:
 
 ```
-docker run -ti --rm [DOCKER_OPTIONS] virome [APPLICATION_OPTIONS]
+docker run -ti --rm --entrypoint /bin/bash virome
 ```
-
-Run the container overriding the default application using the "--entrypoint"
-option:
-
-```
-docker run -ti --rm --entrypoint /bin/bash [DOCKER_OPTIONS] virome
-```
-
 
 ##DOCKER OPTIONS
-
 
 Volumes:
 
@@ -92,16 +83,16 @@ docker run -ti --rm \
 ```
 
 
-##APPLICATION OPTIONS
+##VIROME OPTIONS
 
-These options are available for the default application:
+These options are available to help configure and monitor the pipeline:
 
 ```
   --enable-data-download      download data files (default)
   --disable-data-download     do not download data files
-  --start-web-server          start web server
-  -k, --keep-alive            keep alive
-  --sleep=number              pause number seconds before exiting
+  --start-web-server          start web server (for monitoring progress)
+  -k, --keep-alive            keep alive (do not exit the container when complete)
+  --sleep=number              pause number seconds before exiting the container
   --threads=number            set number of threads
   -h, --help                  display this help and exit
 ```
@@ -113,7 +104,4 @@ docker run -ti --rm \
 	-v /path/to/databasedir:/opt/database \
 	virome [APPLICATION_OPTIONS]
 ```
-
-
-##ERROR HANDLING
 
