@@ -17,7 +17,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 #--------------------------------------------------------------------------------
 # SOFTWARE
 
-ARG WORKFLOW_VERSION=3.1.5
+ARG WORKFLOW_VERSION=3.2.0
 ARG WORKFLOW_DOWNLOAD_URL=http://sourceforge.net/projects/tigr-workflow/files/tigr-workflow/wf-${WORKFLOW_VERSION}.tar.gz
 
 ARG ERGATIS_VERSION=
@@ -32,7 +32,7 @@ ARG TRNASCAN_SE_DOWNLOAD_URL=http://lowelab.ucsc.edu/software/tRNAscan-SE-${TRNA
 #--------------------------------------------------------------------------------
 # BASICS
 
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
 	build-essential \
 	curl \
 	cpanminus \
@@ -42,13 +42,13 @@ RUN apt-get update && apt-get install -y \
 	ncbi-blast+ \
 	sqlite3 \
 	zip \
+	unzip \
 	zsync \
-  && rm -rf /var/lib/apt/lists/*
-
-#--------------------------------------------------------------------------------
-# PERL for ergatis
-
-RUN apt-get update && apt-get install -y \
+	libdbi-perl \
+	libdbd-sqlite3-perl \
+	libmailtools-perl \
+	libmldbm-perl \
+	libxml-libxml-perl \
 	bioperl \
 	libcpan-meta-perl \
 	libcdb-file-perl \
@@ -84,8 +84,7 @@ COPY workflow.deploy.answers /tmp/.
 RUN curl -s -SL $WORKFLOW_DOWNLOAD_URL -o workflow.tar.gz \
 	&& tar -xvf workflow.tar.gz -C /usr/src/workflow \
 	&& rm workflow.tar.gz \
-	&& mkdir -p /opt/workflow/server-conf \
-	&& chmod 777 /opt/workflow/server-conf \
+	&& mkdir -p -m 777 /opt/workflow/server-conf \
 	&& ./deploy.sh < /tmp/workflow.deploy.answers
 
 COPY workflow.log4j.properties /opt/workflow/log4j.properties
@@ -142,18 +141,17 @@ RUN curl -s -SL $TRNASCAN_SE_DOWNLOAD_URL -o trnascan-se.tar.gz \
 	&& make install
 
 #--------------------------------------------------------------------------------
-# SCRATCH
+# SCRATCH 
 
-RUN mkdir -p /usr/local/scratch && chmod 777 /usr/local/scratch \
-	&& mkdir /usr/local/scratch/ergatis && chmod 777 /usr/local/scratch/ergatis \
-	&& mkdir /usr/local/scratch/ergatis/archival && chmod 777 /usr/local/scratch/ergatis/archival \
-	&& mkdir /usr/local/scratch/workflow && chmod 777 /usr/local/scratch/workflow \
-	&& mkdir /usr/local/scratch/workflow/id_repository && chmod 777 /usr/local/scratch/workflow/id_repository \
-	&& mkdir /usr/local/scratch/workflow/runtime && chmod 777 /usr/local/scratch/workflow/runtime \
-	&& mkdir /usr/local/scratch/workflow/runtime/pipeline && chmod 777 /usr/local/scratch/workflow/runtime/pipeline \
-	&& mkdir /usr/local/scratch/workflow/scripts && chmod 777 /usr/local/scratch/workflow/scripts
-
-RUN mkdir /tmp/pipelines_building && chmod 777 /tmp/pipelines_building
+RUN mkdir -p -m 777 /usr/local/scratch \
+	&& mkdir -m 777 /usr/local/scratch/ergatis \
+	&& mkdir -m 777 /usr/local/scratch/ergatis/archival \
+	&& mkdir -m 777 /usr/local/scratch/workflow \
+	&& mkdir -m 777 /usr/local/scratch/workflow/id_repository \
+	&& mkdir -m 777 /usr/local/scratch/workflow/runtime \
+	&& mkdir -m 777 /usr/local/scratch/workflow/runtime/pipeline \
+	&& mkdir -m 777 /usr/local/scratch/workflow/scripts \
+	&& mkdir -m 777 /tmp/pipelines_building
 
 #--------------------------------------------------------------------------------
 # VIROME PROJECT
@@ -175,14 +173,7 @@ RUN mkdir -p /opt/projects/virome \
 #--------------------------------------------------------------------------------
 # APACHE
 
-ENV APACHE_RUN_USER www-data
-ENV APACHE_RUN_GROUP www-data
-
-ENV APACHE_LOG_DIR /var/log/apache2
-ENV APACHE_PID_FILE /var/run/apache2.pid
-ENV APACHE_RUN_DIR /var/run/apache2
-ENV APACHE_LOCK_DIR /var/lock/apache2
-
+COPY apache2.envvars /tmp/.
 COPY ergatis.conf /etc/apache2/conf-available/
 
 RUN a2enmod cgid && a2enconf ergatis
