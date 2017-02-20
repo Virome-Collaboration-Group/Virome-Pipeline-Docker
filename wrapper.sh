@@ -172,6 +172,7 @@ fi
 
 if [ $opt_a -eq 1 ]
 then
+	source /tmp/apache2.envvars
 	/usr/sbin/apachectl start
 fi
 
