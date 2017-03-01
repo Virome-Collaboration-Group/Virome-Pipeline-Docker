@@ -82,7 +82,7 @@ WORKDIR /usr/src/workflow
 COPY workflow.deploy.answers /tmp/.
 
 RUN curl -s -SL $WORKFLOW_DOWNLOAD_URL -o workflow.tar.gz \
-	&& tar -xvf workflow.tar.gz -C /usr/src/workflow \
+	&& tar -xzf workflow.tar.gz -C /usr/src/workflow \
 	&& rm workflow.tar.gz \
 	&& mkdir -p -m 777 /opt/workflow/server-conf \
 	&& ./deploy.sh < /tmp/workflow.deploy.answers
@@ -134,7 +134,7 @@ RUN mkdir -p /usr/src/trnascan-se
 WORKDIR /usr/src/trnascan-se
 
 RUN curl -s -SL $TRNASCAN_SE_DOWNLOAD_URL -o trnascan-se.tar.gz \
-	&& tar --strip-components=1 -xvf trnascan-se.tar.gz -C /usr/src/trnascan-se \
+	&& tar --strip-components=1 -xzf trnascan-se.tar.gz -C /usr/src/trnascan-se \
 	&& rm trnascan-se.tar.gz \
 	&& sed -i -e 's/..HOME./\/opt\/trnascan-se/' Makefile \
 	&& make \
