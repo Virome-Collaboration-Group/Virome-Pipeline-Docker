@@ -6,7 +6,7 @@ Docker container for the Virome pipeline
 Build the container:
 
 ```
-docker build -t virome .
+$ docker build -t virome .
 ```
 
 
@@ -22,7 +22,7 @@ To gain a shell inside the container, override the default entrypoint using the 
 docker option:
 
 ```
-docker run -ti --rm --entrypoint /bin/bash virome
+$ docker run -ti --rm --entrypoint /bin/bash virome
 ```
 
 ### DOCKER OPTIONS
@@ -101,6 +101,6 @@ $ docker run -ti --rm \
 	-v /path/to/inputdir:/opt/input \
 	-v /path/to/outputdir:/opt/output \
 	-v /path/to/databasedir:/opt/database \
-	virome [APPLICATION_OPTIONS]
+	virome [VIROME OPTIONS]
 ```
 
