@@ -194,6 +194,14 @@ VOLUME /opt/database /opt/input /opt/output
 # Copy blastp version to /usr/bin/.
 RUN cp /opt/ergatis/software/ncbi-blast-2.5.0+/bin/* /usr/bin/.
 
+# Set number of parallel runs for changed files
+
+#--------------------------------------------------------------------------------
+# Multithreading - Set number of parallel runs for changed files
+
+RUN num_cores=$(grep -c ^processor /proc/cpuinfo) && \
+	find /opt/ergatis/pipeline_templates -type f -exec /usr/bin/perl -pi -e 's/\$;NODISTRIB\$;\s?=\s?0/\$;NODISTRIB\$;='$num_cores'/g' {} \;
+
 #--------------------------------------------------------------------------------
 # Default Command
 
