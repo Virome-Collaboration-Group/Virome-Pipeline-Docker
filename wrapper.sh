@@ -162,26 +162,29 @@ fi
 
 if [ $opt_d -eq 1 ]
 then
-	cd /opt/input
+    cd /opt/input
 
-	DATA_FILES="\
-		MGOL_DEC2014 \
-		MGOL_DEC2014.60 \
-		UNIREF50_2015_12 \
-		UNIREF100_2015_12 \
-		UniVec_Core \
-		rRNA \
-		mgol60__2__mgol100.lookup \
-		uniref50__2__uniref100.lookup"
+    DATA_FILES="\
+        univec/db.lst \
+        rRNA/db.lst \
+        mgol/db.lst \
+        uniref/db.lst"
 
-	for file in $DATA_FILES
-	do
-		echo "start: `date`: $file"
-		zsync -q http://virome.dbi.udel.edu/repository/$file.zsync
-		test -s $file.zs-old && /bin/rm $file.zs-old
-		test -s $file && chmod 644 $file
-	done
-	echo "completed: `date`"
+    for file in $DATA_FILES
+    do
+        echo "start: `date`: $file"
+        zsync -q http://virome.dbi.udel.edu/db/$file.zsync
+        test -s $file.zs-old && /bin/rm $file.zs-old
+        test -s $file && chmod 644 $file
+
+        for f in `cat $file`
+        do
+            echo "start: `data`: $f"
+            zsync -q $f
+        done
+
+    done
+    echo "completed: `date`"
 fi
 
 #--------------------------------------------------------------------------------
