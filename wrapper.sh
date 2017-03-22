@@ -26,7 +26,7 @@ opt_t=0
 
 # Temporary settings
 opt_f=1
-input_file="/opt/input/play_data.fasta"
+input_file="/opt/play_data/play_data.fasta"
 max_threads=1
 
 while true

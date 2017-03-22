@@ -125,6 +125,8 @@ RUN curl -s -SL $VIROME_DOWNLOAD_URL -o virome.zip \
 	&& perl Makefile.PL INSTALL_BASE=/opt/ergatis \
 	&& make \
 	&& make install \
+	&& mv /opt/ergatis/play_data /opt/play_data \
+	&& gunzip /opt/play_data/*.gz \
 	&& echo "virome = /opt/projects/virome" >> /var/www/html/ergatis/cgi/ergatis.ini
 
 #--------------------------------------------------------------------------------
