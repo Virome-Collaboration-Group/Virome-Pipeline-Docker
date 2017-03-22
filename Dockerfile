@@ -26,9 +26,6 @@ ARG ERGATIS_DOWNLOAD_URL=https://github.com/Virome-Collaboration-Group/ergatis/a
 ARG VIROME_VERSION=
 ARG VIROME_DOWNLOAD_URL=https://github.com/Virome-Collaboration-Group/virome_pipeline/archive/master.zip
 
-ARG TRNASCAN_SE_VERSION=1.3.1
-ARG TRNASCAN_SE_DOWNLOAD_URL=http://lowelab.ucsc.edu/software/tRNAscan-SE-${TRNASCAN_SE_VERSION}.tar.gz
-
 #--------------------------------------------------------------------------------
 # BASICS
 
@@ -69,7 +66,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 	libxml-writer-perl \
   && rm -rf /var/lib/apt/lists/*
 
-COPY lib/lib*.deb /tmp/
+COPY lib/*.deb /tmp/
 
 RUN dpkg -i /tmp/*.deb && rm /tmp/*.deb
 
@@ -130,19 +127,6 @@ RUN curl -s -SL $VIROME_DOWNLOAD_URL -o virome.zip \
 	&& echo "virome = /opt/projects/virome" >> /var/www/html/ergatis/cgi/ergatis.ini
 
 #--------------------------------------------------------------------------------
-# TRNASCAN-SE -- install in /opt/trnascan-se
-
-RUN mkdir -p /usr/src/trnascan-se
-WORKDIR /usr/src/trnascan-se
-
-RUN curl -s -SL $TRNASCAN_SE_DOWNLOAD_URL -o trnascan-se.tar.gz \
-	&& tar --strip-components=1 -xzf trnascan-se.tar.gz -C /usr/src/trnascan-se \
-	&& rm trnascan-se.tar.gz \
-	&& sed -i -e 's/..HOME./\/opt\/trnascan-se/' Makefile \
-	&& make \
-	&& make install
-
-#--------------------------------------------------------------------------------
 # SCRATCH 
 
 RUN mkdir -p -m 777 /usr/local/scratch \
@@ -191,7 +175,9 @@ RUN cp /opt/ergatis/software/ncbi-blast-2.5.0+/bin/* /usr/bin/.
 # Multithreading - Set number of parallel runs for changed files
 
 RUN num_cores=$(grep -c ^processor /proc/cpuinfo) && \
-	find /opt/ergatis/project_saved_templates -type f -exec /usr/bin/perl -pi -e 's/\$;NODISTRIB\$;\s?=\s?0/\$;NODISTRIB\$;='$num_cores'/g' {} \;
+	find /opt/ergatis/project_saved_templates -type f -exec \
+        /usr/bin/perl -pi \
+        -e 's/\$;NODISTRIB\$;\s?=\s?0/\$;NODISTRIB\$;='$num_cores'/g' {} \;
 
 #--------------------------------------------------------------------------------
 # Scripts
