@@ -6,7 +6,7 @@ usage() {
 	echo "Usage: $0 [OPTIONS]"
 	echo "  --enable-data-download      perform data file download (default)"
 	echo "  --disable-data-download     do not perform data file download"
-	echo "  --input-file                input file to process"
+	echo "  --input-file=file           input file to process"
 	echo "  --start-web-server          start web server"
 	echo "  -k,--keep-alive             keep alive"
 	echo "  --sleep=number              pause number seconds before exiting"
@@ -19,9 +19,13 @@ usage() {
 
 opt_a=0
 opt_d=1
+opt_f=0
 opt_k=0
 opt_s=0
 opt_t=0
+
+# Temporary settings
+opt_f=1
 input_file="/opt/input/play_data.fasta"
 max_threads=1
 
@@ -40,6 +44,7 @@ do
 		opt_d=0
 		;;
 	--input-file=?*)
+		opt_f=1
 		input_file=${1#*=}
 		;;
 	--input-file|input-file=)
@@ -94,6 +99,39 @@ then
 fi
 
 #--------------------------------------------------------------------------------
+# Verify input/output/database directories
+
+if [ ! -d /opt/input ]
+then
+	echo "$0: directory not found: /opt/input"
+	exit 1
+fi
+
+if [ ! -d /opt/output ]
+then
+	echo "$0: directory not found: /opt/output"
+	exit 1
+fi
+
+if [ ! -d /opt/database ]
+then
+	echo "$0: directory not found: /opt/database"
+	exit 1
+fi
+
+#--------------------------------------------------------------------------------
+# Verify input file
+
+if [ $opt_f -eq 1 ]
+then
+	if [ ! -f $input_file ]
+	then
+		echo "$0: cannot open input file: $input_file"
+		exit 1
+	fi
+fi
+
+#--------------------------------------------------------------------------------
 # Verify sleep seconds
 
 if [ $opt_s -eq 1 ]
@@ -117,27 +155,6 @@ then
 	fi
 
 	max_threads=${threads}
-fi
-
-#--------------------------------------------------------------------------------
-# Verify input/output/database directories
-
-if [ ! -d /opt/input ]
-then
-	echo "$0: directory not found: /opt/input"
-	exit 1
-fi
-
-if [ ! -d /opt/output ]
-then
-	echo "$0: directory not found: /opt/output"
-	exit 1
-fi
-
-if [ ! -d /opt/database ]
-then
-	echo "$0: directory not found: /opt/database"
-	exit 1
 fi
 
 #--------------------------------------------------------------------------------
@@ -190,7 +207,6 @@ export PERL5LIB=/opt/ergatis/lib/perl5
 -d $max_threads
 
 status=$?
-echo $status
 
 if [ $status -ne 0 ]
 then
@@ -229,3 +245,8 @@ then
 		sleep 60
 	done
 fi
+
+#--------------------------------------------------------------------------------
+# Exit
+
+exit $status
