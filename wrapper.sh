@@ -162,7 +162,7 @@ fi
 
 if [ $opt_d -eq 1 ]
 then
-    cd /opt/input
+    cd /opt/database
 
     DATA_FILES="\
         univec/db.lst \
@@ -177,9 +177,9 @@ then
         test -s $file.zs-old && /bin/rm $file.zs-old
         test -s $file && chmod 644 $file
 
-        for f in `cat $file`
+        for f in `cat /opt/database/db.lst`
         do
-            echo "start: `data`: $f"
+            echo "start: `date`: $f"
             zsync -q $f
         done
 
