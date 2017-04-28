@@ -186,6 +186,14 @@ if [ $opt_d -eq 1 ]
 then
     cd /opt/database
 
+	curl -s -SL http://virome.dbi.udel.edu/db/version.json -o version.json
+
+	#### TO-DO: check version and start download if version is different.
+	#### start download if
+	#### 	- no files in /opt/database
+	####	- version is different
+	####	- Throw error if --disable-datadownload and no files in /opt/database
+
     DATA_FILES="\
         univec/db.lst \
         rRNA/db.lst \
