@@ -11,6 +11,7 @@ usage() {
 	echo "  -k,--keep-alive             keep alive"
 	echo "  --sleep=number              pause number seconds before exiting"
 	echo "  --threads=number            set number of threads"
+	echo "  --test-case[1-4]			Run default test case. Four different test cases available 1-4
 	echo "  -h, --help                  display this help and exit"
 }
 
@@ -23,10 +24,11 @@ opt_f=0
 opt_k=0
 opt_s=0
 opt_t=0
+opt_f=0
+opt_e=0
 
 # Temporary settings
-opt_f=1
-input_file="/opt/play_data/play_data.fasta"
+input_file=""
 max_threads=1
 
 while true
@@ -42,6 +44,22 @@ do
 		;;
 	--disable-data-download)
 		opt_d=0
+		;;
+	--test-case1)
+		opt_e=1
+		input_file="/opt/play_data/play_data.fasta"
+		;;
+	--test-case2)
+		opt_e=1
+		input_file="/opt/play_data/bad_guy_1.fasta"
+		;;
+	--test-case3)
+		opt_e=1
+		input_file="/opt/play_data/bad_guy_2.fasta"
+		;;
+	--test-case4)
+		opt_e=1
+		input_file="/opt/play_data/bad_guy_3.fasta"
 		;;
 	--input-file=?*)
 		opt_f=1
@@ -122,13 +140,17 @@ fi
 #--------------------------------------------------------------------------------
 # Verify input file
 
-if [ $opt_f -eq 1 ]
+if [ $opt_f -eq 0 -a $opt_e -eq 0 ]
 then
-	if [ ! -f $input_file ]
-	then
-		echo "$0: cannot open input file: $input_file"
-		exit 1
-	fi
+	echo "Input file not defined, if running a test case use --test-case[1-4] option"
+	usage
+	exit 1
+fi
+
+if [ ! -f $input_file ]
+then
+	echo "$0: cannot open input file: $input_file"
+	exit 1
 fi
 
 #--------------------------------------------------------------------------------
