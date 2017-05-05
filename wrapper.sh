@@ -11,7 +11,7 @@ usage() {
 	echo "  -k,--keep-alive             keep alive"
 	echo "  --sleep=number              pause number seconds before exiting"
 	echo "  --threads=number            set number of threads"
-	echo "  --test-case[1-4]			Run default test case. Four different test cases available 1-4
+	echo "  --test-case[1-4]			Run default test case. Four different test cases available 1-4"
 	echo "  -h, --help                  display this help and exit"
 }
 
