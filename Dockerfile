@@ -188,9 +188,9 @@ WORKDIR /opt/scripts
 COPY wrapper.sh /opt/scripts/wrapper.sh
 RUN chmod 755 /opt/scripts/wrapper.sh
 
+#--------------------------------------------------------------------------------
+# Where the input data is to be found, and where the output is to be saved.
 VOLUME /opt/database /opt/input /opt/output
-
-# Set number of parallel runs for changed files
 
 #--------------------------------------------------------------------------------
 # Default Command
