@@ -180,7 +180,7 @@ fi
 
 #--------------------------------------------------------------------------------
 # Download data files - if database directory is empty or if there has been a
-# a version update
+# version update
 
 if [ $opt_d -eq 1 ]
 then
@@ -268,16 +268,7 @@ status=$?
 
 if [ $status -ne 0 ]
 then
-	echo "$0: workflow error: $status"
-
-	# Modify the following after clarification about id file
-
-#	id=`cat id.file`
-#
-#	if [ -s /opt/projects/virome/workflow/runtime/pipeline/$id/pipeline.xml.log ]
-#	then
-#		cp /opt/projects/virome/workflow/runtime/pipeline/$id/pipeline.xml.log /opt/output/.
-#	fi
+	echo "$0: pipeline error: $status"
 fi
 
 #--------------------------------------------------------------------------------
