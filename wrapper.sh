@@ -11,7 +11,7 @@ usage() {
 	echo "  -k,--keep-alive             keep alive"
 	echo "  --sleep=number              pause number seconds before exiting"
 	echo "  --threads=number            set number of threads"
-	echo "  --test-case[1-4]			Run default test case. Four different test cases available 1-4"
+	echo "  --test-case[1-4]            run one of four possible test cases"
 	echo "  -h, --help                  display this help and exit"
 }
 
@@ -27,7 +27,6 @@ opt_t=0
 opt_f=0
 opt_e=0
 
-# Temporary settings
 input_file=""
 max_threads=1
 
@@ -180,41 +179,67 @@ then
 fi
 
 #--------------------------------------------------------------------------------
-# Download data files
+# Download data files - if database directory is empty or if there has been a
+# a version update
 
 if [ $opt_d -eq 1 ]
 then
-    cd /opt/database
+	cd /opt/database
 
-	curl -s -SL http://virome.dbi.udel.edu/db/version.json -o version.json
+	download=0
+	
+	find . -mindepth 1 -print -quit | grep -q .
+	retcode=$?
+	
+	if [ $retcode -eq 1 ]
+	then
+		download=1
+	
+		curl -s -SL http://virome.dbi.udel.edu/db/version.json -o version.json
+		mv version.json version.json.current
+	else
+		if [ -s version.json.current ]
+		then
+			curl -s -SL http://virome.dbi.udel.edu/db/version.json -o version.json
+	
+			diff version.json version.json.current >/dev/null
+			retcode=$?
+	
+			if [ $retcode -eq 1 ]
+			then
+				download=1
+			fi
+	
+			mv version.json version.json.current
+		fi
+	fi
+	
+	if [ $download -eq 1 ]
+	then
 
-	#### TO-DO: check version and start download if version is different.
-	#### start download if
-	#### 	- no files in /opt/database
-	####	- version is different
-	####	- Throw error if --disable-datadownload and no files in /opt/database
+		DATA_FILES="\
+			univec/db.lst \
+			rRNA/db.lst \
+			mgol/db.lst \
+			uniref/db.lst"
+	
+		for file in $DATA_FILES
+		do
+			echo "start: `date`: $file"
+			zsync -q http://virome.dbi.udel.edu/db/$file.zsync
+			test -s $file.zs-old && /bin/rm $file.zs-old
+			test -s $file && chmod 644 $file
+	
+			for f in `cat /opt/database/db.lst`
+			do
+				echo "start: `date`: $f"
+				zsync -q $f
+			done
+	
+		done
 
-    DATA_FILES="\
-        univec/db.lst \
-        rRNA/db.lst \
-        mgol/db.lst \
-        uniref/db.lst"
-
-    for file in $DATA_FILES
-    do
-        echo "start: `date`: $file"
-        zsync -q http://virome.dbi.udel.edu/db/$file.zsync
-        test -s $file.zs-old && /bin/rm $file.zs-old
-        test -s $file && chmod 644 $file
-
-        for f in `cat /opt/database/db.lst`
-        do
-            echo "start: `date`: $f"
-            zsync -q $f
-        done
-
-    done
-    echo "completed: `date`"
+		echo "completed: `date`"
+	fi
 fi
 
 #--------------------------------------------------------------------------------
@@ -244,9 +269,15 @@ status=$?
 if [ $status -ne 0 ]
 then
 	echo "$0: workflow error: $status"
-        echo "$0: see pipeline.xml.log file in local output directory"
 
-	cp /opt/projects/virome/workflow/runtime/pipeline/*/pipeline.xml.log /opt/output/.
+	# Modify the following after clarification about id file
+
+#	id=`cat id.file`
+#
+#	if [ -s /opt/projects/virome/workflow/runtime/pipeline/$id/pipeline.xml.log ]
+#	then
+#		cp /opt/projects/virome/workflow/runtime/pipeline/$id/pipeline.xml.log /opt/output/.
+#	fi
 fi
 
 #--------------------------------------------------------------------------------
