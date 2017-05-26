@@ -15,7 +15,7 @@ $ docker build -t virome .
 Run the container:
 
 ```
-docker run -ti --rm [DOCKER OPTIONS] virome [VIROME OPTIONS]
+$ docker run -ti --rm [DOCKER OPTIONS] virome [VIROME OPTIONS]
 ```
 
 To gain a shell inside the container, override the default entrypoint using the "--entrypoint"
