@@ -15,7 +15,7 @@ $ docker build -t virome .
 Run the container:
 
 ```
-$ docker run -ti --rm [DOCKER OPTIONS] virome [VIROME OPTIONS]
+$ docker run -ti --rm [DOCKER OPTIONS] virome [VIROME OPTIONS] file
 ```
 
 To gain a shell inside the container, override the default entrypoint using the "--entrypoint"
@@ -37,7 +37,7 @@ $ docker run -ti --rm \
 	-v /path/to/inputdir:/opt/input \
 	-v /path/to/outputdir:/opt/output \
 	-v /path/to/databasedir:/opt/database \
-	virome
+	virome file
 ```
 
 Port:
@@ -50,7 +50,7 @@ $ docker run -ti --rm \
 	-v /path/to/outputdir:/opt/output \
 	-v /path/to/databasedir:/opt/database \
 	-p 80:80 \
-	virome
+	virome file
 ```
 
 Timezone:
@@ -64,7 +64,7 @@ $ docker run -ti --rm \
 	-v /path/to/outputdir:/opt/output \
 	-v /path/to/databasedir:/opt/database \
 	-e TZ=America/Chicago \
-	virome
+	virome file
 ```
 
 Entrypoint:
@@ -101,6 +101,6 @@ $ docker run -ti --rm \
 	-v /path/to/inputdir:/opt/input \
 	-v /path/to/outputdir:/opt/output \
 	-v /path/to/databasedir:/opt/database \
-	virome [VIROME OPTIONS]
+	virome [VIROME OPTIONS] file
 ```
 
