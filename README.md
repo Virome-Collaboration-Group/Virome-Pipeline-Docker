@@ -37,7 +37,7 @@ $ docker run -ti --rm \
 	-v /path/to/inputdir:/opt/input \
 	-v /path/to/outputdir:/opt/output \
 	-v /path/to/databasedir:/opt/database \
-	virome file
+	virome [VIROME OPTIONS] file
 ```
 
 Port:
@@ -50,7 +50,7 @@ $ docker run -ti --rm \
 	-v /path/to/outputdir:/opt/output \
 	-v /path/to/databasedir:/opt/database \
 	-p 80:80 \
-	virome file
+	virome [VIROME OPTIONS] file
 ```
 
 Timezone:
@@ -64,7 +64,7 @@ $ docker run -ti --rm \
 	-v /path/to/outputdir:/opt/output \
 	-v /path/to/databasedir:/opt/database \
 	-e TZ=America/Chicago \
-	virome file
+	virome [VIROME OPTIONS] file
 ```
 
 Entrypoint:
