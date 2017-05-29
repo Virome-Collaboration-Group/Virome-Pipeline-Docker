@@ -70,6 +70,9 @@ COPY lib/*.deb /tmp/
 
 RUN dpkg -i /tmp/*.deb && rm /tmp/*.deb
 
+#### tRNAScan bug hack
+RUN sed -i 's/$opts->fastafile()/$opts->fasta_file()/' /usr/bin/tRNAscan-SE
+
 #--------------------------------------------------------------------------------
 # WORKFLOW -- install in /opt/workflow
 
