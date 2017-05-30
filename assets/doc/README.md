@@ -9,26 +9,26 @@
 - [Docker](https://docs.docker.com/installation/) for Linux / Windows / OSX
 
 #### Hardware
-- processor/core requirement
+1. processor/core requirement
 ...text here
 
-- min space requirement
+2. min space requirement
 ...text here
 
-- min memory
+3. min memory
 ...text here
 
 ### Configuration
 #### define various terms/mount points
-- Input directory and Input file
+1. Input directory and Input file
 
 .../path/to/inputdir
 
-- Output dir and output
+2. Output dir and output
 
 .../path/to/output
 
-- Subject database file location
+3. Subject database file location
 
 .../path/to/databasedir
 
