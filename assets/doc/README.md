@@ -1,25 +1,26 @@
 # ![VIROME DIY Analysis Pipeline](https://github.com/Virome-Collaboration-Group/Virome-Pipeline-Docker/blob/master/assets/img/virome-diy.png)
 
 ### Introduction
+VIROME DIY is a bioinformatics analysis pipeline used for viral metagenome sequencing data at University of Delaware, DBi.
 
+The pipeline uses Docker... . Its a self-contained image with all tools, software and libraries pre configured.
+
+This pipeline is primarily used on a x86_64 computer server with 24 cpus, 128GB memory. however, the pipeline should be able to run on any system including a modern laptop with 16GB of memory and ample of disk space. We have done some limited testing using AWS, and working towards a stable release.
 
 ### Requirements
 
 #### Software
 - [Docker](https://docs.docker.com/installation/) for Linux / Windows / OSX
 
-#### Hardware
+#### Recommended hardware specifications
 1. processor/core requirement
-   
    text here
 
 2. min space requirement
-   
-   text here
+   250 GB
 
 3. min memory
-   
-   text here
+   128 GB
 
 ### Configuration
 #### define various terms/mount points
