@@ -15,9 +15,9 @@
 
 ### Configuration
 #### define various terms/mount points
--- /path/to/inputdir
--- /path/to/output
--- /path/to/databasedir
+.../path/to/inputdir
+.../path/to/output
+.../path/to/databasedir
 
 
 ### Running the pipeline
