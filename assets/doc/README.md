@@ -5,31 +5,31 @@
 
 ### Requirements
 
-- #Software
+#Software
 - [Docker](https://docs.docker.com/installation/) for Linux / Windows / OSX
 
-- #Hardware
+#Hardware
 —- processor/core requirement
 —- min space requirement
 —- min memory
 
 ### Configuration
-# define various terms/mount points
-—- /path/to/inputdir
-—- /path/to/output
-—- /path/to/databasedir
+#### define various terms/mount points
+-- /path/to/inputdir
+-- /path/to/output
+-- /path/to/databasedir
 
 
 ### Running the pipeline
 ## VIROME OPTIONS
 ```
-—-enable-data-download
+--enable-data-download
 --disable-data-download
-—-start-web-server
-—k, —-keep-alive 
-—-sleep=number
-—-threads=number
--h, —-help
+--start-web-server
+-k, --keep-alive
+--sleep=number
+--threads=number
+-h, --help
 ```
 
 # Get latest docker image of VIROME DIY
