@@ -5,10 +5,10 @@
 
 ### Requirements
 
-#Software
+#### Software
 - [Docker](https://docs.docker.com/installation/) for Linux / Windows / OSX
 
-#Hardware
+#### Hardware
 —- processor/core requirement
 —- min space requirement
 —- min memory
@@ -21,7 +21,7 @@
 
 
 ### Running the pipeline
-## VIROME OPTIONS
+#### VIROME OPTIONS
 ```
 --enable-data-download
 --disable-data-download
@@ -32,17 +32,17 @@
 -h, --help
 ```
 
-# Get latest docker image of VIROME DIY
+#### Get latest docker image of VIROME DIY
 ```
 docker pull virome/virome-pipeline
 ```
 
-# Run default test case using web browser to monitor pipeline progress
+#### Run default test case using web browser to monitor pipeline progress
 ```
 docker run -i -t --rm -p 9000:80 -v /path/to/inputdir:/opt/input -v /path/to/output:/opt/output -v /path/to/databasedir:/opt/database —-entrypoint execute_pipeline_test.sh —-start-web-server virome —-test-case1
 ```
 
-# Run pipeline with use defined input
+#### Run pipeline with use defined input
 ```
 docker run -i -t —-rm -p 9000:80 -v /path/to/inputdir:/opt/input -v /path/to/output:/opt/output -v /path/to/databasedir:/opt/database virome —-input-file=/opt/input/filename.fasta
 ```
