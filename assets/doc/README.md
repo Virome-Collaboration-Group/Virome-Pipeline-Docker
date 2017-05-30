@@ -10,27 +10,30 @@
 
 #### Hardware
 1. processor/core requirement
-...text here
+   
+   text here
 
 2. min space requirement
-...text here
+   
+   text here
 
 3. min memory
-...text here
+   
+   text here
 
 ### Configuration
 #### define various terms/mount points
 1. Input directory and Input file
 
-.../path/to/inputdir
+   /path/to/inputdir
 
 2. Output dir and output
 
-.../path/to/output
+   /path/to/output
 
 3. Subject database file location
 
-.../path/to/databasedir
+   /path/to/databasedir
 
 
 ### Running the pipeline
