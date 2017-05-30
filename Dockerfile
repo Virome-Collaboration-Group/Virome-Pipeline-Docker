@@ -70,6 +70,9 @@ COPY lib/*.deb /tmp/
 
 RUN dpkg -i /tmp/*.deb && rm /tmp/*.deb
 
+#### tRNAScan bug hack
+RUN sed -i 's/$opts->fastafile()/$opts->fasta_file()/' /usr/bin/tRNAscan-SE
+
 #--------------------------------------------------------------------------------
 # WORKFLOW -- install in /opt/workflow
 
@@ -185,14 +188,17 @@ RUN num_cores=$(grep -c ^processor /proc/cpuinfo) && \
 RUN mkdir -p /opt/scripts
 WORKDIR /opt/scripts
 
-COPY wrapper.sh /opt/scripts/wrapper.sh
-RUN chmod 755 /opt/scripts/wrapper.sh
+COPY execute_pipeline.sh /opt/scripts/execute_pipeline.sh
+RUN chmod 755 /opt/scripts/execute_pipeline.sh
 
+COPY execute_pipeline_test.sh /opt/scripts/execute_pipeline_test.sh
+RUN chmod 755 /opt/scripts/execute_pipeline_test.sh
+
+#--------------------------------------------------------------------------------
+# Where the input data is to be found, and where the output is to be saved.
 VOLUME /opt/database /opt/input /opt/output
-
-# Set number of parallel runs for changed files
 
 #--------------------------------------------------------------------------------
 # Default Command
 
-ENTRYPOINT [ "/opt/scripts/wrapper.sh" ]
+ENTRYPOINT [ "/opt/scripts/execute_pipeline.sh" ]

@@ -3,15 +3,14 @@
 
 usage() {
 
-	echo "Usage: $0 [OPTIONS]"
+	echo "Usage: $0 [OPTIONS] file"
 	echo "  --enable-data-download      perform data file download (default)"
 	echo "  --disable-data-download     do not perform data file download"
-	echo "  --input-file=file           input file to process"
 	echo "  --start-web-server          start web server"
-	echo "  -k,--keep-alive             keep alive"
+	echo "  --input-file=file           input file to process"
+	echo "  -k, --keep-alive            keep alive"
 	echo "  --sleep=number              pause number seconds before exiting"
 	echo "  --threads=number            set number of threads"
-	echo "  --test-case[1-4]			Run default test case. Four different test cases available 1-4"
 	echo "  -h, --help                  display this help and exit"
 }
 
@@ -20,22 +19,17 @@ usage() {
 
 opt_a=0
 opt_d=1
-opt_f=0
 opt_k=0
 opt_s=0
 opt_t=0
-opt_f=0
-opt_e=0
 
-# Temporary settings
-input_file=""
 max_threads=1
 
 while true
 do
 	case $1 in
 
-	-h|--help)
+	--help|-h)
 		usage
 		exit
 		;;
@@ -45,41 +39,25 @@ do
 	--disable-data-download)
 		opt_d=0
 		;;
-	--test-case1)
-		opt_e=1
-		input_file="/opt/play_data/play_data.fasta"
-		;;
-	--test-case2)
-		opt_e=1
-		input_file="/opt/play_data/bad_guy_1.fasta"
-		;;
-	--test-case3)
-		opt_e=1
-		input_file="/opt/play_data/bad_guy_2.fasta"
-		;;
-	--test-case4)
-		opt_e=1
-		input_file="/opt/play_data/bad_guy_3.fasta"
-		;;
-	--input-file=?*)
-		opt_f=1
-		input_file=${1#*=}
-		;;
-	--input-file|input-file=)
-		echo "$0: missing argument to '$1' option"
-		usage
-		exit 1
-		;;
 	--start-web-server)
 		opt_a=1
 		;;
-	-k|--keep-alive)
+	--keep-alive|-k)
 		opt_k=1
 		;;
 	--sleep=?*)
 		opt_s=1
 		seconds=${1#*=}
 		;;
+    --input-file=?*)
+        opt_f=1
+        input_file=${1#*=}
+        ;;
+    --input-file|input-file=)
+        echo "$0: missing argument to '$1' option"
+        usage
+        exit 1
+        ;;
 	--sleep|sleep=)
 		echo "$0: missing argument to '$1' option"
 		usage
@@ -110,11 +88,13 @@ do
 	shift
 done
 
-if [ $# != 0 ]
+if [ $# != 1 ]
 then
 	usage
 	exit 1
 fi
+
+input_file=$1
 
 #--------------------------------------------------------------------------------
 # Verify input/output/database directories
@@ -139,13 +119,6 @@ fi
 
 #--------------------------------------------------------------------------------
 # Verify input file
-
-if [ $opt_f -eq 0 -a $opt_e -eq 0 ]
-then
-	echo "Input file not defined, if running a test case use --test-case[1-4] option"
-	usage
-	exit 1
-fi
 
 if [ ! -f $input_file ]
 then
@@ -180,41 +153,67 @@ then
 fi
 
 #--------------------------------------------------------------------------------
-# Download data files
+# Download data files - if database directory is empty or if there has been a
+# version update
 
 if [ $opt_d -eq 1 ]
 then
-    cd /opt/database
+	cd /opt/database
 
-	curl -s -SL http://virome.dbi.udel.edu/db/version.json -o version.json
+	download=0
+	
+	find . -mindepth 1 -print -quit | grep -q .
+	retcode=$?
+	
+	if [ $retcode -eq 1 ]
+	then
+		download=1
+	
+		curl -s -SL http://virome.dbi.udel.edu/db/version.json -o version.json
+		mv version.json version.json.current
+	else
+		if [ -s version.json.current ]
+		then
+			curl -s -SL http://virome.dbi.udel.edu/db/version.json -o version.json
+	
+			diff version.json version.json.current >/dev/null
+			retcode=$?
+	
+			if [ $retcode -eq 1 ]
+			then
+				download=1
+			fi
+	
+			mv version.json version.json.current
+		fi
+	fi
+	
+	if [ $download -eq 1 ]
+	then
 
-	#### TO-DO: check version and start download if version is different.
-	#### start download if
-	#### 	- no files in /opt/database
-	####	- version is different
-	####	- Throw error if --disable-datadownload and no files in /opt/database
+		DATA_FILES="\
+			univec/db.lst \
+			rRNA/db.lst \
+			mgol/db.lst \
+			uniref/db.lst"
+	
+		for file in $DATA_FILES
+		do
+			echo "start: `date`: $file"
+			zsync -q http://virome.dbi.udel.edu/db/$file.zsync
+			test -s $file.zs-old && /bin/rm $file.zs-old
+			test -s $file && chmod 644 $file
+	
+			for f in `cat /opt/database/db.lst`
+			do
+				echo "start: `date`: $f"
+				zsync -q $f
+			done
+	
+		done
 
-    DATA_FILES="\
-        univec/db.lst \
-        rRNA/db.lst \
-        mgol/db.lst \
-        uniref/db.lst"
-
-    for file in $DATA_FILES
-    do
-        echo "start: `date`: $file"
-        zsync -q http://virome.dbi.udel.edu/db/$file.zsync
-        test -s $file.zs-old && /bin/rm $file.zs-old
-        test -s $file && chmod 644 $file
-
-        for f in `cat /opt/database/db.lst`
-        do
-            echo "start: `date`: $f"
-            zsync -q $f
-        done
-
-    done
-    echo "completed: `date`"
+		echo "completed: `date`"
+	fi
 fi
 
 #--------------------------------------------------------------------------------
@@ -243,10 +242,7 @@ status=$?
 
 if [ $status -ne 0 ]
 then
-	echo "$0: workflow error: $status"
-        echo "$0: see pipeline.xml.log file in local output directory"
-
-	cp /opt/projects/virome/workflow/runtime/pipeline/*/pipeline.xml.log /opt/output/.
+	echo "$0: pipeline error: $status"
 fi
 
 #--------------------------------------------------------------------------------
