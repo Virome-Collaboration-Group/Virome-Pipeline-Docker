@@ -7,6 +7,7 @@ usage() {
 	echo "  --enable-data-download      perform data file download (default)"
 	echo "  --disable-data-download     do not perform data file download"
 	echo "  --start-web-server          start web server"
+	echo "  --input-file=file           input file to process"
 	echo "  -k, --keep-alive            keep alive"
 	echo "  --sleep=number              pause number seconds before exiting"
 	echo "  --threads=number            set number of threads"
@@ -48,6 +49,15 @@ do
 		opt_s=1
 		seconds=${1#*=}
 		;;
+    --input-file=?*)
+        opt_f=1
+        input_file=${1#*=}
+        ;;
+    --input-file|input-file=)
+        echo "$0: missing argument to '$1' option"
+        usage
+        exit 1
+        ;;
 	--sleep|sleep=)
 		echo "$0: missing argument to '$1' option"
 		usage
