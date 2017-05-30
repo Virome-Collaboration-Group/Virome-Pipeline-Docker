@@ -14,12 +14,15 @@ This pipeline is primarily used on a x86_64 computer server with 24 cpus, 128GB 
 
 #### Recommended hardware specifications
 1. processor/core requirement
+
    text here
 
 2. min space requirement
+
    250 GB
 
 3. min memory
+
    128 GB
 
 ### Configuration
