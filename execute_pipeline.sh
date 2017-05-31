@@ -161,33 +161,41 @@ then
 	cd /opt/database
 
 	download=0
-	
+
 	find . -mindepth 1 -print -quit | grep -q .
 	retcode=$?
-	
+
 	if [ $retcode -eq 1 ]
 	then
 		download=1
-	
+
 		curl -s -SL http://virome.dbi.udel.edu/db/version.json -o version.json
 		mv version.json version.json.current
 	else
 		if [ -s version.json.current ]
 		then
 			curl -s -SL http://virome.dbi.udel.edu/db/version.json -o version.json
-	
+
 			diff version.json version.json.current >/dev/null
 			retcode=$?
-	
+
 			if [ $retcode -eq 1 ]
 			then
 				download=1
 			fi
-	
+
+			mv version.json version.json.current
+		else
+			#### /opt/database could have files unrelated to database
+			#### assume there are files other than version.json.current
+			#### then download database
+			download=1
+
+			curl -s -SL http://virome.dbi.udel.edu/db/version.json -o version.json
 			mv version.json version.json.current
 		fi
 	fi
-	
+
 	if [ $download -eq 1 ]
 	then
 
@@ -196,20 +204,20 @@ then
 			rRNA/db.lst \
 			mgol/db.lst \
 			uniref/db.lst"
-	
+
 		for file in $DATA_FILES
 		do
 			echo "start: `date`: $file"
 			zsync -q http://virome.dbi.udel.edu/db/$file.zsync
 			test -s $file.zs-old && /bin/rm $file.zs-old
 			test -s $file && chmod 644 $file
-	
+
 			for f in `cat /opt/database/db.lst`
 			do
 				echo "start: `date`: $f"
 				zsync -q $f
 			done
-	
+
 		done
 
 		echo "completed: `date`"
