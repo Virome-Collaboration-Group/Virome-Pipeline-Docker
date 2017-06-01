@@ -193,7 +193,8 @@ then
 			univec/db.lst \
 			rRNA/db.lst \
 			mgol/db.lst \
-			uniref/db.lst"
+			uniref/db.lst \
+			fxn_lookup/db.lst"
 
 		for file in $DATA_FILES
 		do
