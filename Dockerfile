@@ -196,7 +196,16 @@ RUN chmod 755 /opt/scripts/execute_pipeline_test.sh
 
 #--------------------------------------------------------------------------------
 # Where the input data is to be found, and where the output is to be saved.
+
 VOLUME /opt/database /opt/input /opt/output
+
+#--------------------------------------------------------------------------------
+# Non-root user
+
+RUN useradd --create-home --shell /bin/bash virome \
+	&& chown -R virome /opt
+
+USER virome
 
 #--------------------------------------------------------------------------------
 # Default Command
