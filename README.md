@@ -37,7 +37,7 @@ $ docker run -ti --rm \
 	-v /path/to/inputdir:/opt/input \
 	-v /path/to/outputdir:/opt/output \
 	-v /path/to/databasedir:/opt/database \
-	virome [VIROME OPTIONS] file
+	virome/virome-pipeline [VIROME OPTIONS] /opt/input/input_file
 ```
 
 Port:
@@ -50,7 +50,7 @@ $ docker run -ti --rm \
 	-v /path/to/outputdir:/opt/output \
 	-v /path/to/databasedir:/opt/database \
 	-p 80:80 \
-	virome [VIROME OPTIONS] file
+	virome/virome-pipeline [VIROME OPTIONS] /opt/input/input_file
 ```
 
 Timezone:
@@ -64,7 +64,7 @@ $ docker run -ti --rm \
 	-v /path/to/outputdir:/opt/output \
 	-v /path/to/databasedir:/opt/database \
 	-e TZ=America/Chicago \
-	virome [VIROME OPTIONS] file
+	virome/virome-pipeline [VIROME OPTIONS] /opt/input/input_file
 ```
 
 Entrypoint:
@@ -78,7 +78,7 @@ $ docker run -ti --rm \
 	-v /path/to/outputdir:/opt/output \
 	-v /path/to/databasedir:/opt/database \
 	--entrypoint /bin/bash \
-	virome
+	virome/virome-pipeline
 ```
 
 
