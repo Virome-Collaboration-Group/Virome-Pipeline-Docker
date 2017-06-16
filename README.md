@@ -101,6 +101,6 @@ $ docker run -ti --rm \
 	-v /path/to/inputdir:/opt/input \
 	-v /path/to/outputdir:/opt/output \
 	-v /path/to/databasedir:/opt/database \
-	virome [VIROME OPTIONS] file
+	virome/virome-pipeline [VIROME OPTIONS] /opt/input/input_file
 ```
 
