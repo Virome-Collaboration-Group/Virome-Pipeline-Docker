@@ -40,19 +40,6 @@ $ docker run -ti --rm \
 	virome/virome-pipeline [VIROME OPTIONS] /opt/input/input_file
 ```
 
-Port:
-
-Use the "-p" option to publish the web server port.
-
-```
-$ docker run -ti --rm \
-	-v /path/to/inputdir:/opt/input \
-	-v /path/to/outputdir:/opt/output \
-	-v /path/to/databasedir:/opt/database \
-	-p 80:80 \
-	virome/virome-pipeline [VIROME OPTIONS] /opt/input/input_file
-```
-
 Timezone:
 
 Use the "-e" option to set the TZ environment variable to the desired timezone.
@@ -89,7 +76,6 @@ These options are available to help configure and monitor the pipeline:
 ```
   --enable-data-download      download data files (default)
   --disable-data-download     do not download data files
-  --start-web-server          start web server (for monitoring progress)
   -k, --keep-alive            keep alive (do not exit the container when complete)
   --sleep=number              pause number seconds before exiting the container
   --threads=number            set number of threads
