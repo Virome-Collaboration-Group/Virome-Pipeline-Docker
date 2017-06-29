@@ -162,12 +162,15 @@ RUN mkdir -p /opt/projects/virome \
 #--------------------------------------------------------------------------------
 # APACHE
 
-COPY apache2.envvars /tmp/.
-COPY ergatis.conf /etc/apache2/conf-available/
+
+COPY apache2.envvars		/etc/apache2/envvars
+COPY apache2.ports.conf		/etc/apache2/ports.conf
+COPY apache2.000-default.conf	/etc/apache2/sites-enabled/000-default.conf
+COPY ergatis.conf		/etc/apache2/conf-available/.
 
 RUN a2enmod cgid && a2enconf ergatis
 
-EXPOSE 80
+EXPOSE 8080
 
 #--------------------------------------------------------------------------------
 # Copy blastp version to /usr/bin/.
@@ -203,7 +206,11 @@ VOLUME /opt/database /opt/input /opt/output
 # Non-root user
 
 RUN useradd --create-home --shell /bin/bash virome \
-	&& chown -R virome /opt
+	&& chown -R virome /opt \
+	&& chown -R virome /etc/apache2 \
+	&& chown -R virome /var/log/apache2 \
+	&& mkdir -p /tmp/lock /tmp/run/apache2 \
+	&& chown -R virome /tmp/lock /tmp/run
 
 USER virome
 
