@@ -1,12 +1,10 @@
 #!/bin/bash
 
-
 usage() {
 
 	echo "Usage: $0 [OPTIONS] file"
 	echo "  --enable-data-download      perform data file download (default)"
 	echo "  --disable-data-download     do not perform data file download"
-	echo "  --start-web-server          start web server"
 	echo "  -k, --keep-alive            keep alive"
 	echo "  --sleep=number              pause number seconds before exiting"
 	echo "  --threads=number            set number of threads"
@@ -220,7 +218,6 @@ fi
 
 if [ $opt_a -eq 1 ]
 then
-	source /tmp/apache2.envvars
 	/usr/sbin/apachectl start
 fi
 
