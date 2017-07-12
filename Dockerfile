@@ -197,6 +197,12 @@ RUN chmod 755 /opt/scripts/execute_pipeline.sh
 COPY execute_pipeline_test.sh /opt/scripts/execute_pipeline_test.sh
 RUN chmod 755 /opt/scripts/execute_pipeline_test.sh
 
+COPY apache2_test.sh /opt/scripts/apache2_test.sh
+RUN chmod 755 /opt/scripts/apache2_test.sh
+
+COPY output_test.sh /opt/scripts/output_test.sh
+RUN chmod 755 /opt/scripts/output_test.sh
+
 #--------------------------------------------------------------------------------
 # Where the input data is to be found, and where the output is to be saved.
 
