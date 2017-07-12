@@ -4,7 +4,7 @@ if [ -d /opt/output ]
 then
 	cd /opt/output
 
-	mkdir hello
+	mkdir -p hello
 	touch hello/goodbye
 
 	find hello -exec ls -l {} \;
