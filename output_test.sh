@@ -6,6 +6,7 @@ then
 
 	mkdir -p hello
 	touch hello/goodbye
+	chmod -R 777 hello
 
 	find hello -exec ls -l {} \;
 
