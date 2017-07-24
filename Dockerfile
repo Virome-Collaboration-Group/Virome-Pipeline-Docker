@@ -168,6 +168,8 @@ COPY apache2.ports.conf		/etc/apache2/ports.conf
 COPY apache2.000-default.conf	/etc/apache2/sites-enabled/000-default.conf
 COPY ergatis.conf		/etc/apache2/conf-available/.
 
+RUN mkdir -p -m 777 /tmp/lock/apache2 /tmp/log/apache2 /tmp/run/apache2
+
 RUN a2enmod cgid && a2enconf ergatis
 
 EXPOSE 8080
@@ -197,27 +199,21 @@ RUN chmod 755 /opt/scripts/execute_pipeline.sh
 COPY execute_pipeline_test.sh /opt/scripts/execute_pipeline_test.sh
 RUN chmod 755 /opt/scripts/execute_pipeline_test.sh
 
-COPY apache2_test.sh /opt/scripts/apache2_test.sh
-RUN chmod 755 /opt/scripts/apache2_test.sh
-
-COPY output_test.sh /opt/scripts/output_test.sh
-RUN chmod 755 /opt/scripts/output_test.sh
-
 #--------------------------------------------------------------------------------
 # Where the input data is to be found, and where the output is to be saved.
 
 VOLUME /opt/database /opt/input /opt/output
 
 #--------------------------------------------------------------------------------
+# Permissions
+
+RUN find /opt/projects/virome -type d -exec chmod 777 {} \;
+RUN find /opt/workflow -type d -exec chmod 777 {} \;
+
+#--------------------------------------------------------------------------------
 # Non-root user
 
-RUN useradd --create-home --shell /bin/bash virome \
-	&& chown -R virome /opt \
-	&& chown -R virome /etc/apache2 \
-	&& chown -R virome /var/log/apache2 \
-	&& mkdir -p /tmp/lock /tmp/run/apache2 \
-	&& chown -R virome /tmp/lock /tmp/run
-
+RUN useradd --create-home --shell /bin/bash virome
 USER virome
 
 #--------------------------------------------------------------------------------
