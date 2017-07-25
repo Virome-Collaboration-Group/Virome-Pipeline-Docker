@@ -27,6 +27,19 @@ $ docker run -ti --rm --entrypoint /bin/bash virome
 
 ### DOCKER OPTIONS
 
+User:
+
+Use the "-u" option to run the container as the current user.
+
+```
+$ docker run -ti --rm \
+	-u `id -u` \
+	-v /path/to/inputdir:/opt/input \
+	-v /path/to/outputdir:/opt/output \
+	-v /path/to/databasedir:/opt/database \
+	virome/virome-pipeline [VIROME OPTIONS] /opt/input/input_file
+```
+
 Volumes:
 
 Use the "-v" option to share local host directories to the container.  The
@@ -34,6 +47,7 @@ required volumes are /opt/input, /opt/output, /opt/database.
 
 ```
 $ docker run -ti --rm \
+	-u `id -u` \
 	-v /path/to/inputdir:/opt/input \
 	-v /path/to/outputdir:/opt/output \
 	-v /path/to/databasedir:/opt/database \
@@ -47,6 +61,7 @@ The default is TZ=America/New_York.
 
 ```
 $ docker run -ti --rm \
+	-u `id -u` \
 	-v /path/to/inputdir:/opt/input \
 	-v /path/to/outputdir:/opt/output \
 	-v /path/to/databasedir:/opt/database \
@@ -61,6 +76,7 @@ shell, run:
 
 ```
 $ docker run -ti --rm \
+	-u `id -u` \
 	-v /path/to/inputdir:/opt/input \
 	-v /path/to/outputdir:/opt/output \
 	-v /path/to/databasedir:/opt/database \
@@ -71,7 +87,7 @@ $ docker run -ti --rm \
 
 ### VIROME OPTIONS
 
-These options are available to help configure and monitor the pipeline:
+These options are available to help configure the pipeline:
 
 ```
   --enable-data-download      download data files (default)
@@ -84,6 +100,7 @@ These options are available to help configure and monitor the pipeline:
 
 ```
 $ docker run -ti --rm \
+	-u `id -u` \
 	-v /path/to/inputdir:/opt/input \
 	-v /path/to/outputdir:/opt/output \
 	-v /path/to/databasedir:/opt/database \
