@@ -29,11 +29,11 @@ $ docker run -ti --rm --entrypoint /bin/bash virome
 
 User:
 
-Use the "-u" option to run the container as the current user.
+Use the "-u" option to run the container as the current user (uid:gid).
 
 ```
 $ docker run -ti --rm \
-	-u `id -u` \
+	-u `id -u`:`id -g` \
 	-v /path/to/inputdir:/opt/input \
 	-v /path/to/outputdir:/opt/output \
 	-v /path/to/databasedir:/opt/database \
@@ -47,7 +47,7 @@ required volumes are /opt/input, /opt/output, /opt/database.
 
 ```
 $ docker run -ti --rm \
-	-u `id -u` \
+	-u `id -u`:`id -g` \
 	-v /path/to/inputdir:/opt/input \
 	-v /path/to/outputdir:/opt/output \
 	-v /path/to/databasedir:/opt/database \
@@ -61,7 +61,7 @@ The default is TZ=America/New_York.
 
 ```
 $ docker run -ti --rm \
-	-u `id -u` \
+	-u `id -u`:`id -g` \
 	-v /path/to/inputdir:/opt/input \
 	-v /path/to/outputdir:/opt/output \
 	-v /path/to/databasedir:/opt/database \
@@ -76,7 +76,7 @@ shell, run:
 
 ```
 $ docker run -ti --rm \
-	-u `id -u` \
+	-u `id -u`:`id -g` \
 	-v /path/to/inputdir:/opt/input \
 	-v /path/to/outputdir:/opt/output \
 	-v /path/to/databasedir:/opt/database \
@@ -100,7 +100,7 @@ These options are available to help configure the pipeline:
 
 ```
 $ docker run -ti --rm \
-	-u `id -u` \
+	-u `id -u`:`id -g` \
 	-v /path/to/inputdir:/opt/input \
 	-v /path/to/outputdir:/opt/output \
 	-v /path/to/databasedir:/opt/database \
