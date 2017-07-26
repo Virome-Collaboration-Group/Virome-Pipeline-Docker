@@ -176,6 +176,22 @@ then
 fi
 
 #--------------------------------------------------------------------------------
+# Verify whether host is an Amazon EC2 instance
+
+local_hostname=$(hostname -d)
+
+if [[ ${local_hostname} =~ .*\.amazonaws\.com ]]
+then
+        echo "$0: this is an Amazon EC2 instance"
+	host_type=amazonaws
+else
+        echo "$0: this is not an Amazon EC2 instance, or a reverse-customized one"
+	host_type=local
+fi
+
+echo
+
+#--------------------------------------------------------------------------------
 # Download data files - if database directory is empty or if there has been a
 # version update
 
