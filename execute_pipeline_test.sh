@@ -178,18 +178,12 @@ fi
 #--------------------------------------------------------------------------------
 # Verify whether host is an Amazon EC2 instance
 
-local_hostname=$(hostname -d)
-
-if [[ ${local_hostname} =~ .*\.amazonaws\.com ]]
+if [ -f /sys/hypervisor/uuid ] && [ `head -c 3 /sys/hypervisor/uuid` == ec2 ]
 then
-        echo "$0: this is an Amazon EC2 instance"
-	host_type=amazonaws
+	host_type=ec2
 else
-        echo "$0: this is not an Amazon EC2 instance, or a reverse-customized one"
 	host_type=local
 fi
-
-echo
 
 #--------------------------------------------------------------------------------
 # Download data files - if database directory is empty or if there has been a
