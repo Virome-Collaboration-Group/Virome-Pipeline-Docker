@@ -194,20 +194,32 @@ then
 			uniref/latest/db.lst \
 			fxn_lookup/db.lst"
 
-		for file in $DATA_FILES
-		do
-			echo "start: `date`: $file"
-			zsync -q http://virome.dbi.udel.edu/db/$file.zsync
-			test -s $file.zs-old && /bin/rm $file.zs-old
-			test -s $file && chmod 644 $file
-
-			for f in `cat /opt/database/db.lst`
+			for file in $DATA_FILES
 			do
-				echo "start: `date`: $f"
-				zsync -q $f
-			done
+				echo "start: `date`: $file"
+				zsync -q http://virome.dbi.udel.edu/db/$file.zsync
+				test -s $file && chmod 644 $file
 
-		done
+				for f in `cat /opt/database/db.lst`
+				do
+					echo "start: `date`: $f"
+					#### get just the file name from url
+					filename=$(basename "$f" ".zsync")
+
+					#### if file exists pass filename to zsync
+					z_args=""
+					if [ -s "/opt/database/${filename}" ]
+					then
+						z_args="-i /opt/database/${filename}"
+					fi
+
+					zsync -q $z_args $f
+					test -s "/opt/database/${filename}.zs-old" && rm -rf "/opt/database/${filename}.zs-old"
+				done
+
+				#### remove db.lst file within the loop so next db/db.lst does not interfere
+				test -s "/opt/database/db.lst" && rm -rf "/opt/database/db.lst"
+			done
 
 		echo "completed: `date`"
 	fi
