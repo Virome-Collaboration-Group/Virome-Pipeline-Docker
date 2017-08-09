@@ -258,7 +258,7 @@ then
 						z_args="-i /opt/database/${filename}"
 					fi
 
-					zsync $z_args $f
+					zsync -q $z_args $f
 					test -s "/opt/database/${filename}.zs-old" && rm -rf "/opt/database/${filename}.zs-old"
 				done
 
