@@ -141,6 +141,16 @@ then
 fi
 
 #--------------------------------------------------------------------------------
+# Verify whether host is an Amazon EC2 instance
+
+if [ -f /sys/hypervisor/uuid ] && [ `head -c 3 /sys/hypervisor/uuid` == ec2 ]
+then
+	host_type=ec2
+else
+	host_type=local
+fi
+
+#--------------------------------------------------------------------------------
 # Download data files - if database directory is empty or if there has been a
 # version update
 
