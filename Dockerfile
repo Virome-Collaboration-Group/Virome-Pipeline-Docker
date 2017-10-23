@@ -41,6 +41,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 	zip \
 	unzip \
 	zsync \
+        awscli \
 	libdbi-perl \
 	libdbd-sqlite3-perl \
 	libmailtools-perl \
