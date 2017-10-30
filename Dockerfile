@@ -7,10 +7,12 @@ FROM ubuntu:trusty
 MAINTAINER Tom Emmel <temmel@som.umaryland.edu>
 
 # Set default timezone
+
 ENV TZ=America/New_York
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # Handle warnings from apt/dpkg
+
 ARG TERM=linux
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -41,7 +43,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 	zip \
 	unzip \
 	zsync \
-        awscli \
 	libdbi-perl \
 	libdbd-sqlite3-perl \
 	libmailtools-perl \
@@ -65,11 +66,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 	libxml-twig-perl \
 	libxml-rss-perl \
 	libxml-writer-perl \
+	python \
+	python-pip \
   && rm -rf /var/lib/apt/lists/*
 
 COPY lib/*.deb /tmp/
-
 RUN dpkg -i /tmp/*.deb && rm /tmp/*.deb
+
+RUN pip install awscli
 
 #### tRNAScan bug hack
 RUN sed -i 's/$opts->fastafile()/$opts->fasta_file()/' /usr/bin/tRNAscan-SE
