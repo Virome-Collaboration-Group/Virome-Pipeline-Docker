@@ -85,24 +85,42 @@ fi
 input_file=$1
 
 #--------------------------------------------------------------------------------
-# Verify input/output/database directories
+# Verify host environment
 
-if [ ! -d /opt/input ]
+if [ -f /sys/hypervisor/uuid ] && [ `head -c 3 /sys/hypervisor/uuid` == ec2 ]
 then
-	echo "$0: directory not found: /opt/input"
-	exit 1
+	host_type=ec2
+
+elif [ ! -z $IPLANT_EXECUTION_ID ]
+then
+	host_type=cyverse
+	
+else
+	host_type=local
 fi
 
-if [ ! -d /opt/output ]
-then
-	echo "$0: directory not found: /opt/output"
-	exit 1
-fi
+#--------------------------------------------------------------------------------
+# Verify input/output/database directories (???)
 
-if [ ! -d /opt/database ]
+if [ $host_type = "ec2" -o $host_type = "local" ]
 then
-	echo "$0: directory not found: /opt/database"
-	exit 1
+	if [ ! -d /opt/input ]
+	then
+		echo "$0: directory not found: /opt/input"
+		exit 1
+	fi
+	
+	if [ ! -d /opt/output ]
+	then
+		echo "$0: directory not found: /opt/output"
+		exit 1
+	fi
+	
+	if [ ! -d /opt/database ]
+	then
+		echo "$0: directory not found: /opt/database"
+		exit 1
+	fi
 fi
 
 #--------------------------------------------------------------------------------
@@ -141,16 +159,6 @@ then
 fi
 
 #--------------------------------------------------------------------------------
-# Verify whether host is an Amazon EC2 instance
-
-if [ -f /sys/hypervisor/uuid ] && [ `head -c 3 /sys/hypervisor/uuid` == ec2 ]
-then
-	host_type=ec2
-else
-	host_type=local
-fi
-
-#--------------------------------------------------------------------------------
 # Amazon EC2 host instance
 
 if [ $host_type = "ec2" ]
@@ -167,6 +175,16 @@ then
 		echo "$0: aws s3 cp failed: aws return code: $retcode"
 		exit 1
 	fi
+fi
+
+#--------------------------------------------------------------------------------
+# CyVerse host instance
+
+if [ $host_type = "cyverse" ]
+then
+	echo cyverse
+
+	# If necessary, add cyverse-specific handling here
 fi
 
 #--------------------------------------------------------------------------------
