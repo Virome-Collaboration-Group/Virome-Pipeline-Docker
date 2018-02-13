@@ -94,13 +94,13 @@ then
 elif [ ! -z $IPLANT_EXECUTION_ID ]
 then
 	host_type=cyverse
-	
+
 else
 	host_type=local
 fi
 
 #--------------------------------------------------------------------------------
-# Verify input/output/database directories (???)
+# Verify input/output/database directories
 
 if [ $host_type = "ec2" -o $host_type = "local" ]
 then
