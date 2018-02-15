@@ -184,7 +184,19 @@ if [ $host_type = "cyverse" ]
 then
 	echo cyverse
 
-	# If necessary, add cyverse-specific handling here
+	cwd=`pwd`
+
+	if [ -d $cwd/database ]
+	then
+		ln -s $cwd/database /opt/database
+		ls -l /opt/database
+	fi
+
+	if [ -d $cwd/output ]
+	then
+		ln -s $cwd/output /opt/output
+		ls -l /opt/output
+	fi
 fi
 
 #--------------------------------------------------------------------------------
