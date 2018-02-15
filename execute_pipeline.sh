@@ -186,13 +186,13 @@ then
 
 	cwd=`pwd`
 
-	if [ -d $cwd/database ]
+	if [ -d $cwd/database -a ! -L /opt/database ]
 	then
 		ln -s $cwd/database /opt/database
 		ls -l /opt/database
 	fi
 
-	if [ -d $cwd/output ]
+	if [ -d $cwd/output -a ! -L /opt/output ]
 	then
 		ln -s $cwd/output /opt/output
 		ls -l /opt/output
