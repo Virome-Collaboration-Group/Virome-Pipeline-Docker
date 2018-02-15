@@ -207,10 +207,12 @@ RUN chmod 755 /opt/scripts/execute_pipeline_test.sh
 #--------------------------------------------------------------------------------
 # Where the input data is to be found, and where the output is to be saved.
 
-VOLUME /opt/database /opt/input /opt/output
+#VOLUME /opt/database /opt/input /opt/output
 
 #--------------------------------------------------------------------------------
 # Permissions
+
+RUN chmod 777 /opt
 
 RUN find /opt/projects/virome -type d -exec chmod 777 {} \;
 RUN find /opt/workflow -type d -exec chmod 777 {} \;
