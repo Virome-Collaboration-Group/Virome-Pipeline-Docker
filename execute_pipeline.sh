@@ -3,12 +3,12 @@
 usage() {
 
 	echo "Usage: $0 [OPTIONS] file"
-	echo "  --enable-data-download      perform data file download (default)"
-	echo "  --disable-data-download     do not perform data file download"
-	echo "  -k, --keep-alive            keep alive"
-	echo "  --sleep=number              pause number seconds before exiting"
-	echo "  --threads=number            set number of threads"
-	echo "  -h, --help                  display this help and exit"
+	echo "  --enable-data-download             perform data file download (default)"
+	echo "  --disable-data-download            do not perform data file download"
+	echo "  -k, --keep-alive                   keep alive"
+	echo "  --sleep=N                          pause number seconds before exiting"
+	echo "  -t N, --threads N, --threads=N     set number of threads"
+	echo "  -h, --help                         display this help and exit"
 }
 
 #--------------------------------------------------------------------------------
@@ -55,10 +55,22 @@ do
 		opt_t=1
 		threads=${1#*=}
 		;;
-	--threads|threads=)
+	--threads=)
 		echo "$0: missing argument to '$1' option"
 		usage
 		exit 1
+		;;
+	--threads|-t)
+		if [ "$2" ]
+		then
+			opt_t=1
+			threads=$2
+			shift
+		else
+			echo "$0: missing argument to '$1' option"
+			usage
+			exit 1
+		fi
 		;;
 	--)
 		shift
@@ -100,30 +112,6 @@ else
 fi
 
 #--------------------------------------------------------------------------------
-# Verify input/output/database directories
-
-if [ $host_type = "ec2" -o $host_type = "local" ]
-then
-	if [ ! -d /opt/input ]
-	then
-		echo "$0: directory not found: /opt/input"
-		exit 1
-	fi
-	
-	if [ ! -d /opt/output ]
-	then
-		echo "$0: directory not found: /opt/output"
-		exit 1
-	fi
-	
-	if [ ! -d /opt/database ]
-	then
-		echo "$0: directory not found: /opt/database"
-		exit 1
-	fi
-fi
-
-#--------------------------------------------------------------------------------
 # Verify input file
 
 if [ ! -f $input_file ]
@@ -156,6 +144,30 @@ then
 	fi
 
 	max_threads=${threads}
+fi
+
+#--------------------------------------------------------------------------------
+# Verify input/output/database directories
+
+if [ $host_type = "ec2" -o $host_type = "local" ]
+then
+	if [ ! -d /opt/input ]
+	then
+		echo "$0: directory not found: /opt/input"
+		exit 1
+	fi
+	
+	if [ ! -d /opt/output ]
+	then
+		echo "$0: directory not found: /opt/output"
+		exit 1
+	fi
+	
+	if [ ! -d /opt/database ]
+	then
+		echo "$0: directory not found: /opt/database"
+		exit 1
+	fi
 fi
 
 #--------------------------------------------------------------------------------
