@@ -97,21 +97,6 @@ fi
 input_file=$1
 
 #--------------------------------------------------------------------------------
-# Verify host environment
-
-if [ -f /sys/hypervisor/uuid ] && [ `head -c 3 /sys/hypervisor/uuid` == ec2 ]
-then
-	host_type=ec2
-
-elif [ ! -z $IPLANT_EXECUTION_ID ]
-then
-	host_type=cyverse
-
-else
-	host_type=local
-fi
-
-#--------------------------------------------------------------------------------
 # Verify input file
 
 if [ ! -f $input_file ]
@@ -144,6 +129,21 @@ then
 	fi
 
 	max_threads=${threads}
+fi
+
+#--------------------------------------------------------------------------------
+# Detect host environment
+
+if [ -f /sys/hypervisor/uuid ] && [ `head -c 3 /sys/hypervisor/uuid` == ec2 ]
+then
+	host_type=ec2
+
+elif [ ! -z $IPLANT_EXECUTION_ID ]
+then
+	host_type=cyverse
+
+else
+	host_type=local
 fi
 
 #--------------------------------------------------------------------------------
@@ -198,17 +198,34 @@ then
 
 	cwd=`pwd`
 
-	if [ -d $cwd/database -a ! -L /opt/database ]
+	echo $cwd
+
+	if [ ! -d $cwd/output ]
 	then
-		ln -s $cwd/database /opt/database
-		ls -l /opt/database
+		mkdir -m 777 $cwd/output
 	fi
 
 	if [ -d $cwd/output -a ! -L /opt/output ]
 	then
 		ln -s $cwd/output /opt/output
 		ls -l /opt/output
+	else
+		echo "$0: directory not found: $cwd/output"
+		exit 1
 	fi
+
+	if [ -d $cwd/database -a ! -L /opt/database ]
+	then
+		ln -s $cwd/database /opt/database
+		ls -l /opt/database
+	else
+		echo "$0: directory not found: $cwd/database"
+		exit 1
+	fi
+
+	ls -l $cwd
+
+	exit 1
 fi
 
 #--------------------------------------------------------------------------------
