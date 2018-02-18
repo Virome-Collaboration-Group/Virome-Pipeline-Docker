@@ -199,28 +199,28 @@ then
 	cwd=`pwd`
 
 	echo $cwd
+	ls -l $cwd
 
 	if [ ! -d $cwd/output ]
 	then
-		mkdir -m 777 $cwd/output
-	fi
-
-	if [ -d $cwd/output -a ! -L /opt/output ]
-	then
-		ln -s $cwd/output /opt/output
-		ls -l /opt/output
-	else
 		echo "$0: directory not found: $cwd/output"
 		exit 1
+	else
+		if [ ! -L /opt/output ]
+		then
+			ln -s $cwd/output /opt/output
+		fi
 	fi
 
-	if [ -d $cwd/database -a ! -L /opt/database ]
+	if [ ! -d $cwd/database ]
 	then
-		ln -s $cwd/database /opt/database
-		ls -l /opt/database
-	else
 		echo "$0: directory not found: $cwd/database"
 		exit 1
+	else
+		if [ ! -L /opt/database ]
+		then
+			ln -s $cwd/database /opt/database
+		fi
 	fi
 
 	ls -l $cwd
