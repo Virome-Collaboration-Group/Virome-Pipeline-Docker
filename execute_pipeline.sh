@@ -221,7 +221,8 @@ then
 		if [ ! -L /opt/database ]
 		then
 			ln -s $cwd/database /opt/database
-			ls -l /opt/output
+			ls -l /opt/database
+			ls /opt/database | head
 		fi
 	fi
 
@@ -229,14 +230,24 @@ then
 
 	# more debugging
 
-	touch /opt/output/dummy.file
+#	touch /opt/output/dummy.file
+#	result=$?
+#
+#	if [ $result -eq 0 ]
+#	then
+#		ls -l /opt/output/dummy.file
+#	else
+#		echo "$0: cannot create file: /opt/output/dummy.file" 
+#	fi
+
+	touch ./dummy.file
 	result=$?
 
 	if [ $result -eq 0 ]
 	then
-		ls -l /opt/output/dummy.file
+		ls -l ./dummy.file
 	else
-		echo "$0: cannot create file: /opt/output/dummy.file" 
+		echo "$0: cannot create file: ./dummy.file" 
 	fi
 
 	exit 1
