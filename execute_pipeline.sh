@@ -194,8 +194,6 @@ fi
 
 if [ $host_type = "cyverse" ]
 then
-	echo cyverse
-
 	cwd=`pwd`
 
 	echo $cwd
@@ -222,35 +220,21 @@ then
 		then
 			ln -s $cwd/database /opt/database
 			ls -l /opt/database
-			ls /opt/database | head
 		fi
 	fi
 
-	ls -l $cwd
+	# debugging
 
-	# more debugging
-
-#	touch /opt/output/dummy.file
-#	result=$?
-#
-#	if [ $result -eq 0 ]
-#	then
-#		ls -l /opt/output/dummy.file
-#	else
-#		echo "$0: cannot create file: /opt/output/dummy.file" 
-#	fi
-
-	touch ./dummy.file
+	touch /opt/output/dummy.file
 	result=$?
 
 	if [ $result -eq 0 ]
 	then
-		ls -l ./dummy.file
+		ls -l /opt/output/dummy.file
 	else
-		echo "$0: cannot create file: ./dummy.file" 
+		echo "$0: cannot create file: /opt/output/dummy.file" 
+		exit 1
 	fi
-
-	exit 1
 fi
 
 #--------------------------------------------------------------------------------
