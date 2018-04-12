@@ -211,14 +211,16 @@ then
 		fi
 	fi
 
-	if [ ! -d $cwd/database ]
+	database=/iplant/home/shared/virome_subject/database
+
+	if [ ! -d $database ]
 	then
-		echo "$0: directory not found: $cwd/database"
+		echo "$0: directory not found: $database"
 		exit 1
 	else
 		if [ ! -L /opt/database ]
 		then
-			ln -s $cwd/database /opt/database
+			ln -s $database /opt/database
 			ls -l /opt/database
 		fi
 	fi
