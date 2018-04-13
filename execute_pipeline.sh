@@ -238,6 +238,9 @@ mkdir $output
 	# debugging
 
 	touch $cwd/dummy.file
+	result=$?
+
+	if [ $result -eq 0 ]
 	then
 		ls -l $cwd/dummy.file
 	else
