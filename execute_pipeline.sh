@@ -199,19 +199,29 @@ then
 	echo $cwd
 	ls -l $cwd
 
-	if [ ! -d $cwd/output ]
+	output=$cwd/output
+
+####################
+# debugging
+
+output=$cwd/output_tmp
+mkdir $output
+
+####################
+
+	if [ ! -d $output ]
 	then
-		echo "$0: directory not found: $cwd/output"
+		echo "$0: directory not found: $output"
 		exit 1
 	else
 		if [ ! -L /opt/output ]
 		then
-			ln -s $cwd/output /opt/output
+			ln -s $output /opt/output
 			ls -l /opt/output
 		fi
 	fi
 
-	database=/iplant/home/shared/virome_subject/database
+	database=$cwd/database
 
 	if [ ! -d $database ]
 	then
@@ -226,6 +236,14 @@ then
 	fi
 
 	# debugging
+
+	touch $cwd/dummy.file
+	then
+		ls -l $cwd/dummy.file
+	else
+		echo "$0: cannot create file: $cwd/dummy.file" 
+		exit 1
+	fi
 
 	touch /opt/output/dummy.file
 	result=$?
