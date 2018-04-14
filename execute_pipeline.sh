@@ -200,14 +200,7 @@ then
 	ls -l $cwd
 
 	output=$cwd/output
-
-####################
-# debugging
-
-output=$cwd/output_tmp
-mkdir $output
-
-####################
+	mkdir $output
 
 	if [ ! -d $output ]
 	then
@@ -258,6 +251,9 @@ mkdir $output
 		echo "$0: cannot create file: /opt/output/dummy.file" 
 		exit 1
 	fi
+
+	ls -l $cwd
+	exit
 fi
 
 #--------------------------------------------------------------------------------
