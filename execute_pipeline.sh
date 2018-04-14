@@ -228,32 +228,7 @@ then
 		fi
 	fi
 
-	# debugging
-
-	touch $cwd/dummy.file
-	result=$?
-
-	if [ $result -eq 0 ]
-	then
-		ls -l $cwd/dummy.file
-	else
-		echo "$0: cannot create file: $cwd/dummy.file" 
-		exit 1
-	fi
-
-	touch /opt/output/dummy.file
-	result=$?
-
-	if [ $result -eq 0 ]
-	then
-		ls -l /opt/output/dummy.file
-	else
-		echo "$0: cannot create file: /opt/output/dummy.file" 
-		exit 1
-	fi
-
 	ls -l $cwd
-	exit
 fi
 
 #--------------------------------------------------------------------------------
