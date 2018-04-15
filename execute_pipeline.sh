@@ -194,6 +194,10 @@ fi
 
 if [ $host_type = "cyverse" ]
 then
+	echo "input_file: $input_file"
+	echo "max_threads: $max_threads"
+	echo
+
 	cwd=`pwd`
 
 	echo $cwd
@@ -228,6 +232,7 @@ then
 		fi
 	fi
 
+	echo
 	ls -l $cwd
 fi
 
