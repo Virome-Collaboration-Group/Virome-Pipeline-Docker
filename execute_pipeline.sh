@@ -214,7 +214,6 @@ then
 		if [ ! -L /opt/output ]
 		then
 			ln -s $output /opt/output
-			ls -l /opt/output
 		fi
 	fi
 
@@ -228,7 +227,6 @@ then
 		if [ ! -L /opt/database ]
 		then
 			ln -s $database /opt/database
-			ls -l /opt/database
 		fi
 	fi
 
@@ -236,8 +234,6 @@ then
 	ls -l $cwd
 	echo
 	ls -l $database
-
-	exit 
 fi
 
 #--------------------------------------------------------------------------------
