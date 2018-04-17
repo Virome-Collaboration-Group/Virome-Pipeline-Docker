@@ -194,14 +194,9 @@ fi
 
 if [ $host_type = "cyverse" ]
 then
-	echo "input_file: $input_file"
-	echo "max_threads: $max_threads"
-	echo
-
 	cwd=`pwd`
 
-	echo $cwd
-	ls -l $cwd
+	# Output handling
 
 	output=$cwd/output
 	mkdir $output
@@ -217,6 +212,8 @@ then
 		fi
 	fi
 
+	# Database handling
+
 	database=$cwd/database
 
 	if [ ! -d $database ]
@@ -230,10 +227,21 @@ then
 		fi
 	fi
 
+	# Debugging
+
+	echo "input_file: $input_file"
+	echo "max_threads: $max_threads"
+
+	echo
+	ls -l /opt
+
 	echo
 	ls -l $cwd
+
 	echo
-	ls -l $database
+	ls -l $database/MGOL_DEC2014.00.phr
+
+	exit
 fi
 
 #--------------------------------------------------------------------------------
