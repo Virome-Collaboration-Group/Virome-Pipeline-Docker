@@ -233,6 +233,10 @@ then
 	echo "max_threads: $max_threads"
 
 	echo
+	input_file=$cwd/$input_file
+	echo "input_file: $input_file"
+
+	echo
 	ls -l /opt
 
 	echo
@@ -240,8 +244,6 @@ then
 
 	echo
 	ls -l $database/MGOL_DEC2014.00.phr
-
-	exit
 fi
 
 #--------------------------------------------------------------------------------
