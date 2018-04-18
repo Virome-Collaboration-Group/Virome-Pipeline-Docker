@@ -110,7 +110,7 @@ fi
 
 if [ $opt_s -eq 1 ]
 then
-	if [[ ! $seconds =~ ^[0-9]+$ ]]
+	if [ $seconds -lt 1 ]
 	then
 		echo "$0: invalid sleep number: $seconds"
 		exit 1
@@ -122,7 +122,7 @@ fi
 
 if [ $opt_t -eq 1 ]
 then
-	if [[ ! $threads =~ ^[0-9]+$ ]]
+	if [ $threads -lt 1 ]
 	then
 		echo "$0: invalid thread number: $threads"
 		exit 1
@@ -199,7 +199,7 @@ then
 	# Output handling
 
 	output=$cwd/output
-	mkdir $output
+	mkdir -p $output
 
 	if [ ! -d $output ]
 	then
