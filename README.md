@@ -93,8 +93,9 @@ These options are available to help configure the pipeline:
   --enable-data-download      download data files (default)
   --disable-data-download     do not download data files
   -k, --keep-alive            keep alive (do not exit the container when complete)
-  --sleep=number              pause number seconds before exiting the container
-  --threads=number            set number of threads
+  -l, --time-limit=N          set N hour time limit
+  --sleep=N                   set N second pause exiting the container
+  --threads=N                 set N threads
   -h, --help                  display this help and exit
 ```
 
