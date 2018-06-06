@@ -1,14 +1,15 @@
-#!/bin/bash
+sleep_#!/bin/bash
 
 usage() {
 
 	echo "Usage: $0 [OPTIONS] file"
-	echo "  --enable-data-download             perform data file download (default)"
-	echo "  --disable-data-download            do not perform data file download"
-	echo "  -k, --keep-alive                   keep alive"
-	echo "  --sleep=N                          pause number seconds before exiting"
-	echo "  -t N, --threads N, --threads=N     set number of threads"
-	echo "  -h, --help                         display this help and exit"
+	echo "  --enable-data-download                     perform data file download (default)"
+	echo "  --disable-data-download                    do not perform data file download"
+	echo "  -k, --keep-alive                           keep alive"
+	echo "  -l N, --time-limit N, --time-limit=N       set N hour time limit"
+	echo "  --sleep=N                                  set N second pause before exiting"
+	echo "  -t N, --threads N, --threads=N             set N threads"
+	echo "  -h, --help                                 display this help and exit"
 }
 
 #--------------------------------------------------------------------------------
@@ -17,10 +18,12 @@ usage() {
 opt_a=0
 opt_d=1
 opt_k=0
+opt_l=0
 opt_s=0
 opt_t=0
 
 max_threads=1
+max_time_limit=100
 
 while true
 do
@@ -44,7 +47,7 @@ do
 		;;
 	--sleep=?*)
 		opt_s=1
-		seconds=${1#*=}
+		sleep_seconds=${1#*=}
 		;;
 	--sleep|sleep=)
 		echo "$0: missing argument to '$1' option"
@@ -65,6 +68,27 @@ do
 		then
 			opt_t=1
 			threads=$2
+			shift
+		else
+			echo "$0: missing argument to '$1' option"
+			usage
+			exit 1
+		fi
+		;;
+	--time-limit=?*)
+		opt_l=1
+		limit=${1#*=}
+		;;
+	--time-limit=)
+		echo "$0: missing argument to '$1' option"
+		usage
+		exit 1
+		;;
+	--time-limit|-l)
+		if [ "$2" ]
+		then
+			opt_l=1
+			time_limit=$2
 			shift
 		else
 			echo "$0: missing argument to '$1' option"
@@ -110,9 +134,9 @@ fi
 
 if [ $opt_s -eq 1 ]
 then
-	if [ $seconds -lt 1 ]
+	if [ $sleep_seconds -lt 1 ]
 	then
-		echo "$0: invalid sleep number: $seconds"
+		echo "$0: invalid sleep seconds: $sleep_seconds"
 		exit 1
 	fi
 fi
@@ -129,6 +153,20 @@ then
 	fi
 
 	max_threads=${threads}
+fi
+
+#--------------------------------------------------------------------------------
+# Verify time limit
+
+if [ $opt_l -eq 1 ]
+then
+	if [ $time_limit -lt 1 ]
+	then
+		echo "$0: invalid time limit: $time_limit"
+		exit 1
+	fi
+
+	max_time_limit=${time_limit}
 fi
 
 #--------------------------------------------------------------------------------
@@ -231,6 +269,7 @@ then
 
 	echo "input_file: $input_file"
 	echo "max_threads: $max_threads"
+	echo "max_time_limit: $max_time_limit"
 
 	echo
 	input_file=$cwd/$input_file
@@ -355,7 +394,8 @@ export PERL5LIB=/opt/ergatis/lib/perl5
 -e /var/www/html/ergatis/cgi/ergatis.ini \
 -i /opt/projects/virome/workflow/project_id_repository/ \
 -f $input_file \
--d $max_threads
+-d $max_threads \
+-l $max_time_limit
 
 status=$?
 
@@ -378,8 +418,8 @@ fi
 
 if [ $opt_s -eq 1 ]
 then
-	echo "sleeping $seconds seconds before exiting..."
-	sleep $seconds
+	echo "sleeping $sleep_seconds seconds before exiting..."
+	sleep $sleep_seconds
 fi
 
 #--------------------------------------------------------------------------------
