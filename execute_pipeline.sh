@@ -201,6 +201,11 @@ then
 	output=$cwd/output
 	mkdir -p $output
 
+	#### temp map output repo here
+	mkdir -p $output/run_time_files
+	rm -rf /opt/projects/virome/output_repository
+	ln -s $output/run_time_files /opt/projects/virome/output_repository
+
 	if [ ! -d $output ]
 	then
 		echo "$0: directory not found: $output"
