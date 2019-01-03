@@ -22,13 +22,13 @@ ARG DEBIAN_FRONTEND=noninteractive
 ARG WORKFLOW_VERSION=3.2.0
 ARG WORKFLOW_DOWNLOAD_URL=http://sourceforge.net/projects/tigr-workflow/files/tigr-workflow/wf-${WORKFLOW_VERSION}.tar.gz
 
-ARG ERGATIS_VERSION=v2r19b5
-ARG ERGATIS_DOWNLOAD_URL=https://github.com/Virome-Collaboration-Group/ergatis/archive/${ERGATIS_VERSION}.zip
+ARG ERGATIS_VERSION=2r19b5
+ARG ERGATIS_DOWNLOAD_URL=https://github.com/Virome-Collaboration-Group/ergatis/archive/v${ERGATIS_VERSION}.zip
 #ARG ERGATIS_DOWNLOAD_URL=https://github.com/Virome-Collaboration-Group/ergatis/archive/master.zip
 
 
-ARG VIROME_VERSION=v1.5
-ARG VIROME_DOWNLOAD_URL=https://github.com/Virome-Collaboration-Group/virome_pipeline/archive/${VIROME_VERSION}.zip
+ARG VIROME_VERSION=1.5
+ARG VIROME_DOWNLOAD_URL=https://github.com/Virome-Collaboration-Group/virome_pipeline/archive/v${VIROME_VERSION}.zip
 #ARG VIROME_DOWNLOAD_URL=https://github.com/Virome-Collaboration-Group/virome_pipeline/archive/master.zip
 
 
@@ -111,13 +111,13 @@ RUN curl -s -SL $ERGATIS_DOWNLOAD_URL -o ergatis.zip \
 	&& unzip -o ergatis.zip \
 	&& rm ergatis.zip \
 	&& mkdir /opt/ergatis \
-	&& cd /usr/src/ergatis/ergatis-master \
+	&& cd /usr/src/ergatis/ergatis-${ERGATIS_VERSION} \
 	&& cp /tmp/ergatis.install.fix . \
 	&& ./ergatis.install.fix \
 	&& perl Makefile.PL INSTALL_BASE=/opt/ergatis \
 	&& make \
 	&& make install \
-	&& mv /usr/src/ergatis/ergatis-master/htdocs /var/www/html/ergatis \
+	&& mv /usr/src/ergatis/ergatis-${ERGATIS_VERSION}/htdocs /var/www/html/ergatis \
 	&& cp /tmp/ergatis.ini /var/www/html/ergatis/cgi/.
 
 #--------------------------------------------------------------------------------
@@ -129,7 +129,7 @@ WORKDIR /usr/src/virome
 RUN curl -s -SL $VIROME_DOWNLOAD_URL -o virome.zip \
 	&& unzip -o virome.zip \
 	&& rm virome.zip \
-	&& cd /usr/src/virome/virome_pipeline-master \
+	&& cd /usr/src/virome/virome_pipeline-${VIROME_VERSION} \
 	&& ./pre.install.fix \
 	&& perl Makefile.PL INSTALL_BASE=/opt/ergatis \
 	&& make \
