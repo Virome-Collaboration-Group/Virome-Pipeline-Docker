@@ -22,11 +22,15 @@ ARG DEBIAN_FRONTEND=noninteractive
 ARG WORKFLOW_VERSION=3.2.0
 ARG WORKFLOW_DOWNLOAD_URL=http://sourceforge.net/projects/tigr-workflow/files/tigr-workflow/wf-${WORKFLOW_VERSION}.tar.gz
 
-ARG ERGATIS_VERSION=
-ARG ERGATIS_DOWNLOAD_URL=https://github.com/Virome-Collaboration-Group/ergatis/archive/master.zip
+ARG ERGATIS_VERSION=v2r19b5
+ARG ERGATIS_DOWNLOAD_URL=https://github.com/Virome-Collaboration-Group/ergatis/archive/${ERGATIS_VERSION}.zip
+#ARG ERGATIS_DOWNLOAD_URL=https://github.com/Virome-Collaboration-Group/ergatis/archive/master.zip
 
-ARG VIROME_VERSION=
-ARG VIROME_DOWNLOAD_URL=https://github.com/Virome-Collaboration-Group/virome_pipeline/archive/master.zip
+
+ARG VIROME_VERSION=v1.5
+ARG VIROME_DOWNLOAD_URL=https://github.com/Virome-Collaboration-Group/virome_pipeline/archive/${VIROME_VERSION}.zip
+#ARG VIROME_DOWNLOAD_URL=https://github.com/Virome-Collaboration-Group/virome_pipeline/archive/master.zip
+
 
 #--------------------------------------------------------------------------------
 # BASICS
@@ -135,7 +139,7 @@ RUN curl -s -SL $VIROME_DOWNLOAD_URL -o virome.zip \
 	&& echo "virome = /opt/projects/virome" >> /var/www/html/ergatis/cgi/ergatis.ini
 
 #--------------------------------------------------------------------------------
-# SCRATCH 
+# SCRATCH
 
 RUN mkdir -p -m 777 /usr/local/scratch \
 	&& mkdir -m 777 /usr/local/scratch/ergatis \
