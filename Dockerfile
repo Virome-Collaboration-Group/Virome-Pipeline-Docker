@@ -28,8 +28,8 @@ ARG ERGATIS_DOWNLOAD_URL=https://github.com/Virome-Collaboration-Group/ergatis/a
 
 
 ARG VIROME_VERSION=1.5
-ARG VIROME_DOWNLOAD_URL=https://github.com/Virome-Collaboration-Group/virome_pipeline/archive/v${VIROME_VERSION}.zip
-#ARG VIROME_DOWNLOAD_URL=https://github.com/Virome-Collaboration-Group/virome_pipeline/archive/master.zip
+#ARG VIROME_DOWNLOAD_URL=https://github.com/Virome-Collaboration-Group/virome_pipeline/archive/v${VIROME_VERSION}.zip
+ARG VIROME_DOWNLOAD_URL=https://github.com/Virome-Collaboration-Group/virome_pipeline/archive/master.zip
 
 
 #--------------------------------------------------------------------------------
