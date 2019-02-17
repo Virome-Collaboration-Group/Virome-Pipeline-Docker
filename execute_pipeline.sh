@@ -156,13 +156,13 @@ then
 		echo "$0: directory not found: /opt/input"
 		exit 1
 	fi
-	
+
 	if [ ! -d /opt/output ]
 	then
 		echo "$0: directory not found: /opt/output"
 		exit 1
 	fi
-	
+
 	if [ ! -d /opt/database ]
 	then
 		echo "$0: directory not found: /opt/database"
@@ -179,7 +179,7 @@ then
 
 	cd /opt/database
 
-	aws --no-sign-request s3 cp --recursive --quiet s3://virome . 
+	aws --no-sign-request s3 cp --recursive --quiet s3://virome .
 	retcode=$?
 
 	if [ $retcode -ne 0 ]
@@ -258,87 +258,89 @@ if [ $host_type = "local" ]
 then
 	# Download data files if /opt/database is empty or if there has been a
 	# version update
-	
+
 	if [ $opt_d -eq 1 ]
 	then
 		cd /opt/database
-	
+
 		download=0
-	
+
 		find . -mindepth 1 -print -quit | grep -q .
 		retcode=$?
-	
+
 		if [ $retcode -eq 1 ]
 		then
 			download=1
-	
+
 			curl -s -SL http://virome.dbi.udel.edu/db/version.json -o version.json
 			mv version.json version.json.current
 		else
 			if [ -s version.json.current ]
 			then
 				curl -s -SL http://virome.dbi.udel.edu/db/version.json -o version.json
-	
+
 				diff version.json version.json.current >/dev/null
 				retcode=$?
-	
+
 				if [ $retcode -eq 1 ]
 				then
 					download=1
 				fi
-	
+
 				mv version.json version.json.current
 			else
 				#### /opt/database could have files unrelated to database
 				#### assume there are files other than version.json.current
 				#### then download database
 				download=1
-	
+
 				curl -s -SL http://virome.dbi.udel.edu/db/version.json -o version.json
 				mv version.json version.json.current
 			fi
 		fi
-	
+
 		if [ $download -eq 1 ]
 		then
-	
+
 			DATA_FILES="\
 				univec/db.lst \
 				rRNA/db.lst \
 				mgol/db.lst \
 				uniref/latest/db.lst \
 				fxn_lookup/db.lst"
-	
+
 				for file in $DATA_FILES
 				do
 					echo "start: `date`: $file"
 					zsync -q http://virome.dbi.udel.edu/db/$file.zsync
 					test -s $file && chmod 644 $file
-	
+
 					for f in `cat /opt/database/db.lst`
 					do
 						echo "start: `date`: $f"
 						#### get just the file name from url
 						filename=$(basename "$f" ".zsync")
-	
+
 						#### if file exists pass filename to zsync
 						z_args=""
 						if [ -s "/opt/database/${filename}" ]
 						then
 							z_args="-i /opt/database/${filename}"
 						fi
-	
+
 						zsync -q $z_args $f
 						test -s "/opt/database/${filename}.zs-old" && rm -rf "/opt/database/${filename}.zs-old"
 					done
-	
+
 					#### remove db.lst file within the loop so next db/db.lst does not interfere
 					test -s "/opt/database/db.lst" && rm -rf "/opt/database/db.lst"
 				done
-	
 			echo "completed: `date`"
 		fi
 	fi
+
+	echo "Change permission to database file to ensure read privileage for all"
+	chmod 664 /opt/database/*
 fi
 
 #--------------------------------------------------------------------------------
