@@ -32,6 +32,11 @@ ARG VIROME_DOWNLOAD_URL=https://github.com/Virome-Collaboration-Group/virome_pip
 #ARG VIROME_VERSION=v1.5
 #ARG VIROME_DOWNLOAD_URL=https://github.com/Virome-Collaboration-Group/virome_pipeline/archive/v${VIROME_VERSION}.zip
 
+ARG TRNASCAN_VERSION=2.0.2
+ARG TRNASCAN_DOWNLOAD_URL=http://trna.ucsc.edu/software/trnascan-se-${TRNASCAN_VERSION}.tar.gz
+
+ARG INFERNAL_VERSION=1.1.2
+ARG INFERNAL_DOWNLOAD_URL=http://eddylab.org/infernal/infernal-${INFERNAL_VERSION}.tar.gz
 
 #--------------------------------------------------------------------------------
 # BASICS
@@ -81,7 +86,22 @@ RUN dpkg -i /tmp/*.deb && rm /tmp/*.deb
 RUN pip install awscli
 
 #### tRNAScan bug hack
-RUN sed -i 's/$opts->fastafile()/$opts->fasta_file()/' /usr/bin/tRNAscan-SE
+#RUN sed -i 's/$opts->fastafile()/$opts->fasta_file()/' /usr/bin/tRNAscan-SE
+
+#--------------------------------------------------------------------------------
+# tRNAscan-SE install
+
+WORKDIR /tmp
+
+RUN curl -s -SL $INFERNAL_DOWNLOAD_URL -o infernal.tar.gz \
+	&& tar -xzf infernal.tar.gz -C /tmp/infernal \
+	&& cd /tmp/infernal && ./configure && make && make install \
+	&& rm infernal.tar.gz
+
+RUN curl -s -SL $TRNASCAN_DOWNLOAD_URL -o trnascan.tar.gz \
+	&& tar -xzf trnascan.tar.gz -C /tmp/trnascan \
+	&& cd /tmp/trnascan && ./configure && make && make install \
+	&& rm trnascan.tar.gz
 
 #--------------------------------------------------------------------------------
 # WORKFLOW -- install in /opt/workflow

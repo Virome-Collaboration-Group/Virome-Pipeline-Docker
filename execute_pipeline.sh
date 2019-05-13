@@ -285,9 +285,12 @@ then
 				if [ $retcode -eq 1 ]
 				then
 					download=1
+					mv version.json version.json.current
+				else
+					rm version.json
 				fi
 
-				mv version.json version.json.current
+
 			else
 				#### /opt/database could have files unrelated to database
 				#### assume there are files other than version.json.current
