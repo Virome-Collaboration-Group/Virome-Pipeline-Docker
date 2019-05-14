@@ -28,7 +28,7 @@ ARG ERGATIS_DOWNLOAD_URL=https://github.com/Virome-Collaboration-Group/ergatis/a
 
 
 ARG VIROME_VERSION=master
-ARG VIROME_DOWNLOAD_URL=https://github.com/Virome-Collaboration-Group/virome_pipeline/archive/master.zip
+ARG VIROME_DOWNLOAD_URL=https://github.com/Virome-Collaboration-Group/virome_pipeline/archive/${VIROME_VERSION}.zip
 #ARG VIROME_VERSION=v1.5
 #ARG VIROME_DOWNLOAD_URL=https://github.com/Virome-Collaboration-Group/virome_pipeline/archive/v${VIROME_VERSION}.zip
 
@@ -94,13 +94,13 @@ RUN pip install awscli
 WORKDIR /tmp
 
 RUN curl -s -SL $INFERNAL_DOWNLOAD_URL -o infernal.tar.gz \
-	&& tar -xzf infernal.tar.gz -C /tmp/infernal \
-	&& cd /tmp/infernal && ./configure && make && make install \
+	&& tar -xzf infernal.tar.gz \
+	&& cd ./infernal-${INFERNAL_VERSION} && ./configure && make && make install \
 	&& rm infernal.tar.gz
 
 RUN curl -s -SL $TRNASCAN_DOWNLOAD_URL -o trnascan.tar.gz \
-	&& tar -xzf trnascan.tar.gz -C /tmp/trnascan \
-	&& cd /tmp/trnascan && ./configure && make && make install \
+	&& tar -xzf trnascan.tar.gz \
+	&& cd ./tRNAscan-SE-2.0 && ./configure && make && make install \
 	&& rm trnascan.tar.gz
 
 #--------------------------------------------------------------------------------
