@@ -96,12 +96,12 @@ WORKDIR /tmp
 RUN curl -s -SL $INFERNAL_DOWNLOAD_URL -o infernal.tar.gz \
 	&& tar -xzf infernal.tar.gz \
 	&& cd ./infernal-${INFERNAL_VERSION} && ./configure && make && make install \
-	&& rm infernal.tar.gz
+	&& rm /tmp/infernal.tar.gz
 
 RUN curl -s -SL $TRNASCAN_DOWNLOAD_URL -o trnascan.tar.gz \
 	&& tar -xzf trnascan.tar.gz \
 	&& cd ./tRNAscan-SE-2.0 && ./configure && make && make install \
-	&& rm trnascan.tar.gz
+	&& rm /tmp/trnascan.tar.gz
 
 #--------------------------------------------------------------------------------
 # WORKFLOW -- install in /opt/workflow
