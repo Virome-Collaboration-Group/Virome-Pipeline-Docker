@@ -80,7 +80,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 	python-pip \
   && rm -rf /var/lib/apt/lists/*
 
-COPY lib/*.deb /tmp/
+COPY lib/libfile-mirror-perl_0.10-1_all.deb /tmp/
+COPY lib/liblog-cabin-perl_0.06-1_all.deb /tmp/
+COPY lib/libtree-nary-perl_1.3-1_all.deb /tmp/
 RUN dpkg -i /tmp/*.deb && rm /tmp/*.deb
 
 RUN pip install awscli
@@ -96,12 +98,12 @@ WORKDIR /tmp
 RUN curl -s -SL $INFERNAL_DOWNLOAD_URL -o infernal.tar.gz \
 	&& tar -xzf infernal.tar.gz \
 	&& cd ./infernal-${INFERNAL_VERSION} && ./configure && make && make install \
-	&& rm /tmp/infernal.tar.gz
+	&& rm /tmp/infernal.tar.gz && rm -rf /tmp/infernal-${INFERNAL_VERSION}
 
 RUN curl -s -SL $TRNASCAN_DOWNLOAD_URL -o trnascan.tar.gz \
 	&& tar -xzf trnascan.tar.gz \
 	&& cd ./tRNAscan-SE-2.0 && ./configure && make && make install \
-	&& rm /tmp/trnascan.tar.gz
+	&& rm /tmp/trnascan.tar.gz && rm -rf /tmp/tRNAscan-SE-2.0
 
 #--------------------------------------------------------------------------------
 # WORKFLOW -- install in /opt/workflow
