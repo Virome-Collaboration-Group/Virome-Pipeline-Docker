@@ -27,10 +27,10 @@ ARG ERGATIS_DOWNLOAD_URL=https://github.com/Virome-Collaboration-Group/ergatis/a
 #ARG ERGATIS_DOWNLOAD_URL=https://github.com/Virome-Collaboration-Group/ergatis/archive/master.zip
 
 
-ARG VIROME_VERSION=master
-ARG VIROME_DOWNLOAD_URL=https://github.com/Virome-Collaboration-Group/virome_pipeline/archive/${VIROME_VERSION}.zip
-#ARG VIROME_VERSION=v1.5
-#ARG VIROME_DOWNLOAD_URL=https://github.com/Virome-Collaboration-Group/virome_pipeline/archive/v${VIROME_VERSION}.zip
+#ARG VIROME_VERSION=master
+#ARG VIROME_DOWNLOAD_URL=https://github.com/Virome-Collaboration-Group/virome_pipeline/archive/${VIROME_VERSION}.zip
+ARG VIROME_VERSION=v1.6
+ARG VIROME_DOWNLOAD_URL=https://github.com/Virome-Collaboration-Group/virome_pipeline/archive/v${VIROME_VERSION}.zip
 
 ARG TRNASCAN_VERSION=2.0.2
 ARG TRNASCAN_DOWNLOAD_URL=http://trna.ucsc.edu/software/trnascan-se-${TRNASCAN_VERSION}.tar.gz
