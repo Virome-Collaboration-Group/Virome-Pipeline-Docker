@@ -19,6 +19,7 @@ opt_d=1
 opt_k=0
 opt_s=0
 opt_t=0
+opt_v=0
 
 max_threads=1
 
@@ -38,6 +39,9 @@ do
 		;;
 	--start-web-server)
 		opt_a=1
+		;;
+	--debug)
+		opt_v=1
 		;;
 	--keep-alive|-k)
 		opt_k=1
@@ -187,6 +191,14 @@ then
 		echo "$0: aws s3 cp failed: aws return code: $retcode"
 		exit 1
 	fi
+
+	if [ $opt_v -eq 1 ]
+	then
+		#### temp map output repo here
+		mkdir -p /opt/output/run_time_files
+		rm -rf /opt/projects/virome/output_repository
+		ln -s /opt/output/run_time_files /opt/projects/virome/output_repository
+	fi
 fi
 
 #--------------------------------------------------------------------------------
@@ -201,10 +213,13 @@ then
 	output=$cwd/output
 	mkdir -p $output
 
-	#### temp map output repo here
-	mkdir -p $output/run_time_files
-	rm -rf /opt/projects/virome/output_repository
-	ln -s $output/run_time_files /opt/projects/virome/output_repository
+	if [ $opt_v -eq 1 ]
+	then
+		#### temp map output repo here
+		mkdir -p $output/run_time_files
+		rm -rf /opt/projects/virome/output_repository
+		ln -s $output/run_time_files /opt/projects/virome/output_repository
+	fi
 
 	if [ ! -d $output ]
 	then
@@ -289,8 +304,6 @@ then
 				else
 					rm version.json
 				fi
-
-
 			else
 				#### /opt/database could have files unrelated to database
 				#### assume there are files other than version.json.current
@@ -304,7 +317,6 @@ then
 
 		if [ $download -eq 1 ]
 		then
-
 			DATA_FILES="\
 				univec/db.lst \
 				rRNA/db.lst \
@@ -344,6 +356,14 @@ then
 
 	echo "Change permission to database file to ensure read privileage for all"
 	chmod 664 /opt/database/*
+
+	if [ $opt_v -eq 1 ]
+	then
+		#### temp map output repo here
+		mkdir -p /opt/output/run_time_files
+		rm -rf /opt/projects/virome/output_repository
+		ln -s /opt/output/run_time_files /opt/projects/virome/output_repository
+	fi
 fi
 
 #--------------------------------------------------------------------------------
