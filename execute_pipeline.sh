@@ -40,8 +40,24 @@ do
 	--start-web-server)
 		opt_a=1
 		;;
+	--debug=?*)
+		opt_v=${1#*=}
+		;;
+	--debug=)
+		echo "$0: missing argument to --debug option"
+		usage
+		exit 1
+		;;
 	--debug)
-		opt_v=1
+		if [ "$2" ]
+		then
+			opt_v=$2
+			shift
+		else
+			echo "$0: missing argument to --debug option"
+			usage
+			exit 1
+		fi
 		;;
 	--keep-alive|-k)
 		opt_k=1
@@ -192,12 +208,12 @@ then
 		exit 1
 	fi
 
-	if [ $opt_v -eq 1 ]
+	if [ $opt_v -ne 0 ]
 	then
 		#### temp map output repo here
-		mkdir -p /opt/output/run_time_files
+		mkdir -p /opt/output/output_repository
 		rm -rf /opt/projects/virome/output_repository
-		ln -s /opt/output/run_time_files /opt/projects/virome/output_repository
+		ln -s /opt/output/output_repository /opt/projects/virome/output_repository
 	fi
 fi
 
@@ -213,12 +229,12 @@ then
 	output=$cwd/output
 	mkdir -p $output
 
-	if [ $opt_v -eq 1 ]
+	if [ $opt_v -ne 0 ]
 	then
 		#### temp map output repo here
-		mkdir -p $output/run_time_files
+		mkdir -p $output/output_repository
 		rm -rf /opt/projects/virome/output_repository
-		ln -s $output/run_time_files /opt/projects/virome/output_repository
+		ln -s $output/output_repository /opt/projects/virome/output_repository
 	fi
 
 	if [ ! -d $output ]
@@ -357,12 +373,12 @@ then
 	echo "Change permission to database file to ensure read privileage for all"
 	chmod 664 /opt/database/*
 
-	if [ $opt_v -eq 1 ]
+	if [ $opt_v -ne 0 ]
 	then
 		#### temp map output repo here
-		mkdir -p /opt/output/run_time_files
+		mkdir -p /opt/output/output_repository
 		rm -rf /opt/projects/virome/output_repository
-		ln -s /opt/output/run_time_files /opt/projects/virome/output_repository
+		ln -s /opt/output/output_repository /opt/projects/virome/output_repository
 	fi
 fi
 
@@ -378,6 +394,8 @@ fi
 # Configure/run virome pipeline
 
 export PERL5LIB=/opt/ergatis/lib/perl5
+
+
 
 /opt/ergatis/autopipe_package/virome_little_run_pipeline.pl \
 -t /opt/ergatis/project_saved_templates/little-pipeline/ \
