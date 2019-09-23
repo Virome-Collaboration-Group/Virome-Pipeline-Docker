@@ -395,8 +395,6 @@ fi
 
 export PERL5LIB=/opt/ergatis/lib/perl5
 
-
-
 /opt/ergatis/autopipe_package/virome_little_run_pipeline.pl \
 -t /opt/ergatis/project_saved_templates/little-pipeline/ \
 -r /opt/projects/virome \

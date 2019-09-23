@@ -23,6 +23,7 @@ opt_f=0
 opt_k=0
 opt_s=0
 opt_t=0
+opt_v=0
 
 input_file=""
 max_threads=1
@@ -40,6 +41,25 @@ do
 		;;
 	--disable-data-download)
 		opt_d=0
+		;;
+	--debug=?*)
+		opt_v=${1#*=}
+		;;
+	--debug=)
+		echo "$0: missing argument to --debug option"
+		usage
+		exit 1
+		;;
+	--debug)
+		if [ "$2" ]
+		then
+			opt_v=$2
+			shift
+		else
+			echo "$0: missing argument to --debug option"
+			usage
+			exit 1
+		fi
 		;;
 	--test-case1)
 		opt_e=1
@@ -267,6 +287,14 @@ then
 			done
 
 		echo "completed: `date`"
+	fi
+
+	if [ $opt_v -ne 0 ]
+	then
+		#### temp map output repo here
+		mkdir -p /opt/output/output_repository
+		rm -rf /opt/projects/virome/output_repository
+		ln -s /opt/output/output_repository /opt/projects/virome/output_repository
 	fi
 fi
 
