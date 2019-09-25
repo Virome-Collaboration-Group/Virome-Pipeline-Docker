@@ -401,7 +401,8 @@ export PERL5LIB=/opt/ergatis/lib/perl5
 -e /var/www/html/ergatis/cgi/ergatis.ini \
 -i /opt/projects/virome/workflow/project_id_repository/ \
 -f $input_file \
--d $max_threads
+-d $max_threads \
+-v $opt_v
 
 status=$?
 
