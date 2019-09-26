@@ -288,14 +288,6 @@ then
 
 		echo "completed: `date`"
 	fi
-
-	if [ $opt_v -ne 0 ]
-	then
-		#### temp map output repo here
-		mkdir -p /opt/output/output_repository
-		rm -rf /opt/projects/virome/output_repository
-		ln -s /opt/output/output_repository /opt/projects/virome/output_repository
-	fi
 fi
 
 #--------------------------------------------------------------------------------
@@ -308,6 +300,13 @@ fi
 
 #--------------------------------------------------------------------------------
 # Configure/run virome pipeline
+if [ $opt_v -ne 0 ]
+then
+	#### temp map output repo here
+	mkdir -p /opt/output/output_repository
+	rm -rf /opt/projects/virome/output_repository
+	ln -s /opt/output/output_repository /opt/projects/virome/output_repository
+fi
 
 export PERL5LIB=/opt/ergatis/lib/perl5
 

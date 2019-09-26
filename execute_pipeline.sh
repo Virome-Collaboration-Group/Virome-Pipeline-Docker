@@ -207,14 +207,6 @@ then
 		echo "$0: aws s3 cp failed: aws return code: $retcode"
 		exit 1
 	fi
-
-	if [ $opt_v -ne 0 ]
-	then
-		#### temp map output repo here
-		mkdir -p /opt/output/output_repository
-		rm -rf /opt/projects/virome/output_repository
-		ln -s /opt/output/output_repository /opt/projects/virome/output_repository
-	fi
 fi
 
 #--------------------------------------------------------------------------------
@@ -228,14 +220,6 @@ then
 
 	output=$cwd/output
 	mkdir -p $output
-
-	if [ $opt_v -ne 0 ]
-	then
-		#### temp map output repo here
-		mkdir -p $output/output_repository
-		rm -rf /opt/projects/virome/output_repository
-		ln -s $output/output_repository /opt/projects/virome/output_repository
-	fi
 
 	if [ ! -d $output ]
 	then
@@ -372,14 +356,6 @@ then
 
 	echo "Change permission to database file to ensure read privileage for all"
 	chmod 664 /opt/database/*
-
-	if [ $opt_v -ne 0 ]
-	then
-		#### temp map output repo here
-		mkdir -p /opt/output/output_repository
-		rm -rf /opt/projects/virome/output_repository
-		ln -s /opt/output/output_repository /opt/projects/virome/output_repository
-	fi
 fi
 
 #--------------------------------------------------------------------------------
@@ -392,6 +368,13 @@ fi
 
 #--------------------------------------------------------------------------------
 # Configure/run virome pipeline
+if [ $opt_v -ne 0 ]
+then
+	#### temp map output repo here
+	mkdir -p /opt/output/output_repository
+	rm -rf /opt/projects/virome/output_repository
+	ln -s /opt/output/output_repository /opt/projects/virome/output_repository
+fi
 
 export PERL5LIB=/opt/ergatis/lib/perl5
 
