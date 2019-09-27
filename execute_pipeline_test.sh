@@ -302,10 +302,11 @@ fi
 # Configure/run virome pipeline
 if [ $opt_v -ne 0 ]
 then
+	hn=`hostname`
 	#### temp map output repo here
-	mkdir -p /opt/output/output_repository
+	mkdir -p /opt/output/output_repository_${hn}
 	rm -rf /opt/projects/virome/output_repository
-	ln -s /opt/output/output_repository /opt/projects/virome/output_repository
+	ln -s /opt/output/output_repository_${hn} /opt/projects/virome/output_repository
 fi
 
 export PERL5LIB=/opt/ergatis/lib/perl5
