@@ -7,6 +7,7 @@ usage() {
 	echo "  --disable-data-download            do not perform data file download"
 	echo "  -k, --keep-alive                   keep alive"
 	echo "  --sleep=N                          pause number seconds before exiting"
+	echo " --blast-only"
 	echo "  -t N, --threads N, --threads=N     set number of threads"
 	echo "  -h, --help                         display this help and exit"
 }
@@ -20,6 +21,7 @@ opt_k=0
 opt_s=0
 opt_t=0
 opt_v=0
+opt_b=0
 
 max_threads=1
 
@@ -36,6 +38,9 @@ do
 		;;
 	--disable-data-download)
 		opt_d=0
+		;;
+	--blast-only)
+		opt_b=1
 		;;
 	--start-web-server)
 		opt_a=1
@@ -379,16 +384,31 @@ fi
 
 export PERL5LIB=/opt/ergatis/lib/perl5
 
-/opt/ergatis/autopipe_package/virome_little_run_pipeline.pl \
--t /opt/ergatis/project_saved_templates/little-pipeline/ \
--r /opt/projects/virome \
--e /var/www/html/ergatis/cgi/ergatis.ini \
--i /opt/projects/virome/workflow/project_id_repository/ \
--f $input_file \
--d $max_threads \
--v $opt_v
+if [ $opt_b -eq 1 ]
+then
+	/opt/ergatis/autopipe_package/virome_blastonly_pipeline.pl \
+	-t /opt/ergatis/project_saved_templates/virome-pipeline/ \
+	-r /opt/projects/virome \
+	-e /var/www/html/ergatis/cgi/ergatis.ini \
+	-i /opt/projects/virome/workflow/project_id_repository/ \
+	-f $input_file \
+	-d $max_threads \
+	-v $opt_v
 
-status=$?
+	status=$?
+else
+	/opt/ergatis/autopipe_package/virome_complete_pipeline.pl \
+	-t /opt/ergatis/project_saved_templates/virome-pipeline/ \
+	-r /opt/projects/virome \
+	-e /var/www/html/ergatis/cgi/ergatis.ini \
+	-i /opt/projects/virome/workflow/project_id_repository/ \
+	-f $input_file \
+	-d $max_threads \
+	-v $opt_v
+
+	status=$?
+fi
+
 
 if [ $status -ne 0 ]
 then
