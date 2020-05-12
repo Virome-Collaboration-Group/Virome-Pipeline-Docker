@@ -319,7 +319,7 @@ export PERL5LIB=/opt/ergatis/lib/perl5
 if [ $opt_b -eq 1 ]
 then
 	/opt/ergatis/autopipe_package/virome_blastonly_pipeline.pl \
-	-t /opt/ergatis/project_saved_templates/little-pipeline/ \
+	-t /opt/ergatis/project_saved_templates/virome-pipeline/ \
 	-r /opt/projects/virome \
 	-e /var/www/html/ergatis/cgi/ergatis.ini \
 	-i /opt/projects/virome/workflow/project_id_repository/ \
@@ -330,7 +330,7 @@ then
 	status=$?
 else
 	/opt/ergatis/autopipe_package/virome_complete_pipeline.pl \
-	-t /opt/ergatis/project_saved_templates/little-pipeline/ \
+	-t /opt/ergatis/project_saved_templates/virome-pipeline/ \
 	-r /opt/projects/virome \
 	-e /var/www/html/ergatis/cgi/ergatis.ini \
 	-i /opt/projects/virome/workflow/project_id_repository/ \
