@@ -131,7 +131,7 @@ input_file=$1
 
 if [ $opt_p -eq 1 ]
 then
-	if [ ! -d $input_file ]
+	if [ ! -d "/opt/input/${input_file}" ]
 	then
 		echo "$0: Not a directory, input to post-blast must be a input dir unpacked from blastonly output: $input_file"
 		exit 1
@@ -418,7 +418,7 @@ else
 		-r /opt/projects/virome \
 		-e /var/www/html/ergatis/cgi/ergatis.ini \
 		-i /opt/projects/virome/workflow/project_id_repository/ \
-		-f $input_file \
+		-f /opt/input/${input_file} \
 		-d $max_threads \
 		-v $opt_v
 
