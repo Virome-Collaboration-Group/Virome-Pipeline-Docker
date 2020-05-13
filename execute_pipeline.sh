@@ -411,7 +411,7 @@ then
 
 	status=$?
 else
-	if [$opt_p -eq 1 ]
+	if [ $opt_p -eq 1 ]
 	then
 		/opt/ergatis/autopipe_package/virome_postblast_pipeline.pl \
 		-t /opt/ergatis/project_saved_templates/virome-pipeline/ \
