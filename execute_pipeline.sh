@@ -8,6 +8,7 @@ usage() {
 	echo "  -k, --keep-alive                   keep alive"
 	echo "  --sleep=N                          pause number seconds before exiting"
 	echo " --blast-only"
+	echo " --post-blast-only"
 	echo "  -t N, --threads N, --threads=N     set number of threads"
 	echo "  -h, --help                         display this help and exit"
 }
@@ -22,6 +23,7 @@ opt_s=0
 opt_t=0
 opt_v=0
 opt_b=0
+opt_p=0
 
 max_threads=1
 
@@ -41,6 +43,9 @@ do
 		;;
 	--blast-only)
 		opt_b=1
+		;;
+	--post-blast-only)
+		opt_p=1
 		;;
 	--start-web-server)
 		opt_a=1
@@ -124,10 +129,19 @@ input_file=$1
 #--------------------------------------------------------------------------------
 # Verify input file
 
-if [ ! -f $input_file ]
+if [ $opt_p -eq 1 ]
 then
-	echo "$0: cannot open input file: $input_file"
-	exit 1
+	if [ ! -d $input_file ]
+	then
+		echo "$0: Not a directory, input to post-blast must be a input dir unpacked from blastonly output: $input_file"
+		exit 1
+	fi
+else
+	if [ ! -f $input_file ]
+	then
+		echo "$0: cannot open input file: $input_file"
+		exit 1
+	fi
 fi
 
 #--------------------------------------------------------------------------------
@@ -397,16 +411,30 @@ then
 
 	status=$?
 else
-	/opt/ergatis/autopipe_package/virome_complete_pipeline.pl \
-	-t /opt/ergatis/project_saved_templates/virome-pipeline/ \
-	-r /opt/projects/virome \
-	-e /var/www/html/ergatis/cgi/ergatis.ini \
-	-i /opt/projects/virome/workflow/project_id_repository/ \
-	-f $input_file \
-	-d $max_threads \
-	-v $opt_v
+	if [$opt_p -eq 1 ]
+	then
+		/opt/ergatis/autopipe_package/virome_postblast_pipeline.pl \
+		-t /opt/ergatis/project_saved_templates/virome-pipeline/ \
+		-r /opt/projects/virome \
+		-e /var/www/html/ergatis/cgi/ergatis.ini \
+		-i /opt/projects/virome/workflow/project_id_repository/ \
+		-i $input_file \
+		-d $max_threads \
+		-v $opt_v
 
-	status=$?
+		status=$?
+	else
+		/opt/ergatis/autopipe_package/virome_complete_pipeline.pl \
+		-t /opt/ergatis/project_saved_templates/virome-pipeline/ \
+		-r /opt/projects/virome \
+		-e /var/www/html/ergatis/cgi/ergatis.ini \
+		-i /opt/projects/virome/workflow/project_id_repository/ \
+		-f $input_file \
+		-d $max_threads \
+		-v $opt_v
+
+		status=$?
+	fi
 fi
 
 
