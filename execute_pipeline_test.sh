@@ -350,7 +350,7 @@ else
 		-r /opt/projects/virome \
 		-e /var/www/html/ergatis/cgi/ergatis.ini \
 		-i /opt/projects/virome/workflow/project_id_repository/ \
-		-f $input_file \
+		-f /opt/input/${input_file} \
 		-d $max_threads \
 		-v $opt_v
 
